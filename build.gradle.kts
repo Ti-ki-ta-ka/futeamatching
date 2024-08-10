@@ -6,6 +6,7 @@ plugins {
     kotlin("plugin.noarg") version "1.9.24"
     kotlin("plugin.allopen") version "1.9.24"
     kotlin("kapt") version "1.9.24"
+    id("com.gorylenko.gradle-git-properties") version "2.4.1" // git 모니터링을 위한 플러그인 추가
 }
 
 group = "org.teamsparta"
@@ -64,6 +65,8 @@ dependencies {
     implementation("com.querydsl:querydsl-jpa:$queryDslVersion:jakarta")
     implementation("org.springframework.boot:spring-boot-starter-batch:3.0.6")
     implementation("org.springframework:spring-jdbc")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")// 액추에이터
+    implementation("io.micrometer:micrometer-registry-prometheus") // 프로메테우스 마이크로미터 구현체 추가
 
     kapt("com.querydsl:querydsl-apt:$queryDslVersion:jakarta")
     kapt("jakarta.annotation:jakarta.annotation-api")
