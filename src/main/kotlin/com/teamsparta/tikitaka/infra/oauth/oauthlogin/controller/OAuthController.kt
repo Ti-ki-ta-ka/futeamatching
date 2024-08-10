@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import kotlin.math.log
 
 @RestController
 @RequestMapping("/api/v2")
@@ -15,9 +16,9 @@ class OAuthController(
 ) {
 
     @GetMapping("/oauth/kakako")
-    fun kakaoLoginPage(response: HttpServletResponse): String {
+    fun kakaoLoginPage(response: HttpServletResponse) {
         val loginPageUrl = oauthLoginService.generateKakaoLoginPageUrl()
-        return loginPageUrl
+        response.sendRedirect(loginPageUrl)
     }
 
     @GetMapping("/login/oauth2/code/kakao")
@@ -29,9 +30,9 @@ class OAuthController(
     }
 
     @GetMapping("/oauth/naver")
-    fun naverLoginPage(response: HttpServletResponse): String {
+    fun naverLoginPage(response: HttpServletResponse) {
         val loginPageUrl = oauthLoginService.generateNaverLoginPageUrl()
-        return loginPageUrl
+        response.sendRedirect(loginPageUrl)
     }
 
     @GetMapping("/login/oauth2/code/naver")

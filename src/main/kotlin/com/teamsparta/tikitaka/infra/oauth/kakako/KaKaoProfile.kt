@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 
 data class KaKaoProfile(
     @JsonProperty("profile_image_url")
-    val image: String,
+    val image: String?,
     @JsonProperty("nickname")
     val nickname: String
 )

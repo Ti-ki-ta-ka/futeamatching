@@ -43,7 +43,10 @@ class Users(
     var oAuthProvider: String? = null,
 
     @Column(name = "oauth_provider_id")
-    var oAuthProviderId: String? = null
+    var oAuthProviderId: String? = null,
+
+    @Column(name = "email_enabled", nullable = false)
+var emailEnabled: Boolean = true
 ) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
