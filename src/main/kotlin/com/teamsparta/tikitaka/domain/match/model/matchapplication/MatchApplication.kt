@@ -48,4 +48,8 @@ class MatchApplication(
             )
         }
     }
+
+    fun updateApproveStatus(approveStatus: ApproveStatus) {
+        this.approveStatus = approveStatus
+    }
 }

@@ -28,8 +28,10 @@ noArg {
     annotation("jakarta.persistence.Embeddable")
 }
 
+val jjwtVersion = "0.12.6"
 val queryDslVersion = "5.0.0"
-
+val kotestVersion = "5.8.1"
+val mockkVersion = "1.13.8"
 
 configurations {
     compileOnly {
@@ -50,6 +52,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-aop")
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("io.jsonwebtoken:jjwt-api:0.12.3")
+    implementation("com.h2database:h2")
+    implementation("io.jsonwebtoken:jjwt-api:$jjwtVersion")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("com.amazonaws:aws-java-sdk-s3:1.12.741")
@@ -58,28 +62,31 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("com.querydsl:querydsl-jpa:$queryDslVersion:jakarta")
+    implementation("org.springframework.boot:spring-boot-starter-batch:3.0.6")
+    implementation("org.springframework:spring-jdbc")
+
     kapt("com.querydsl:querydsl-apt:$queryDslVersion:jakarta")
     kapt("jakarta.annotation:jakarta.annotation-api")
     kapt("jakarta.persistence:jakarta.persistence-api")
     implementation("org.springframework.boot:spring-boot-starter-batch")
     implementation("org.springframework.boot:spring-boot-starter-aop")
 
-
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-    testImplementation("io.mockk:mockk:1.13.9")
-    testImplementation("io.kotest:kotest-runner-junit5:5.7.2")
-    testImplementation("io.kotest:kotest-assertions-core:5.7.2")
+    testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
+    testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
+    testImplementation("io.kotest.extensions:kotest-extensions-spring:1.1.1")
+    testImplementation("org.springframework.security:spring-security-test")
+    testImplementation("com.appmattus.fixture:fixture:1.2.0")
+    testImplementation("com.appmattus.fixture:fixture-kotest:1.2.0")
+    testImplementation("io.mockk:mockk:$mockkVersion")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
-
-
     runtimeOnly("org.postgresql:postgresql")
-    runtimeOnly("com.h2database:h2")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.3")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.3")
-
 }
 
 kotlin {
