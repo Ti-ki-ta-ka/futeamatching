@@ -104,11 +104,6 @@ class MatchServiceImpl3(
         applications?.forEach { it.delete() }
     }
 
-    @Cacheable("getMatches")
-    override fun getMatches(pageable: Pageable): Page<MatchResponse> {
-        return matchRepository.findAll(pageable)
-            .map { match -> MatchResponse.from(match) }
-    }
 
     @StopWatch
     @Cacheable("getMatchesByDateAndRegion")

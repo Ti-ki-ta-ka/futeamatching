@@ -12,6 +12,7 @@ import com.teamsparta.tikitaka.infra.security.CustomPreAuthorize
 import com.teamsparta.tikitaka.infra.security.UserPrincipal
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
 import org.springframework.data.web.PageableDefault
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -59,7 +60,7 @@ class MatchController3(
     fun getMatches(
         @RequestParam matchDate: String,
         @RequestParam(required = false) regions: List<Region>?,
-        @PageableDefault(size = 20, sort = ["createdAt,desc"]) pageable: Pageable
+        @PageableDefault(size = 20, sort = ["createdAt"], direction = Sort.Direction.DESC) pageable: Pageable
     ): ResponseEntity<Page<MatchResponse>> {
         println("Received date: $matchDate, region: $regions")
         val matches = matchService.getMatchesByDateAndRegion(pageable, LocalDate.parse(matchDate), regions)
