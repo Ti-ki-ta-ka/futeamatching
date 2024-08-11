@@ -1,6 +1,7 @@
 package com.teamsparta.tikitaka.domain.team.dto.response
 
 import com.teamsparta.tikitaka.domain.team.model.Team
+import java.io.Serializable
 import java.time.LocalDateTime
 
 data class TeamResponse(
@@ -14,8 +15,11 @@ data class TeamResponse(
     val recruitStatus: Boolean,
     val region: String,
     val createAt: LocalDateTime
-) {
+) : Serializable {
     companion object {
+
+        private const val serialVersionUID = 2L
+
         fun from(
             team: Team
         ): TeamResponse {

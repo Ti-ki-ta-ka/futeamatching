@@ -44,8 +44,10 @@ class SecurityConfig(
                     "/api/v2/matches/by-deadline",
                     "/api/v2/matches/available",
                     "/oauth/**",
-                    "/login/oauth2/**"
-                ).permitAll()
+                    "/login/oauth2/**",
+                    "/my-monitor/**",
+
+                    ).permitAll()
                     .anyRequest().authenticated()
             }
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)

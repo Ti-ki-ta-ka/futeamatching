@@ -8,7 +8,7 @@ import com.teamsparta.tikitaka.domain.recruitment.model.recruitmentapplication.R
 import com.teamsparta.tikitaka.domain.recruitment.repository.RecruitmentRepository
 import com.teamsparta.tikitaka.domain.recruitment.repository.recruitmentapplication.RecruitmentApplicationRepository
 import com.teamsparta.tikitaka.domain.team.repository.TeamRepository
-import com.teamsparta.tikitaka.domain.team.service.v2.LeaderTeamService
+import com.teamsparta.tikitaka.domain.team.service.v2.LeaderTeamService2
 import jakarta.transaction.Transactional
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -18,7 +18,7 @@ class LeaderRecruitmentApplicationServiceImpl(
     private val recruitmentRepository: RecruitmentRepository,
     private val recruitmentApplicationRepository: RecruitmentApplicationRepository,
     private val teamRepository: TeamRepository,
-    private val teamService: LeaderTeamService,
+    private val teamService: LeaderTeamService2,
 ) : LeaderRecruitmentApplicationService {
 
     @Transactional
