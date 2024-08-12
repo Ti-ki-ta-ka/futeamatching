@@ -47,7 +47,9 @@ class SecurityConfig(
                     "/login/oauth2/**",
                     "/api/v3/users/log-in",
                     "/api/v3/users/sign-up",
-                    "/api/v3/users/create-code"
+                    "/api/v3/users/create-code",
+                    "/api/v2/oauth/**",
+                    "/api/v2/login/oauth2/**"
                     "/my-monitor/**"
                     ).permitAll()
                     .anyRequest().authenticated()
