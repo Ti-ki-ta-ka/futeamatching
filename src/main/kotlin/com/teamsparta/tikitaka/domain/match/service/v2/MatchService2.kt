@@ -5,18 +5,18 @@ import com.teamsparta.tikitaka.domain.match.dto.MatchResponse
 import com.teamsparta.tikitaka.domain.match.dto.MyTeamMatchResponse
 import com.teamsparta.tikitaka.domain.match.dto.PostMatchRequest
 import com.teamsparta.tikitaka.domain.match.dto.UpdateMatchRequest
+import com.teamsparta.tikitaka.domain.match.model.Match
 import com.teamsparta.tikitaka.domain.match.model.SortCriteria
 import com.teamsparta.tikitaka.infra.security.UserPrincipal
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import java.time.LocalDate
-import java.time.LocalDateTime
 
 interface MatchService2 {
 
     fun postMatch(principal: UserPrincipal, request: PostMatchRequest): MatchResponse
-    fun updateMatch(principal: UserPrincipal, matchId: Long, request: UpdateMatchRequest): MatchResponse
-    fun deleteMatch(principal: UserPrincipal, matchId: Long): MatchResponse
+    fun updateMatch(principal: UserPrincipal, matchId: Long, request: UpdateMatchRequest, match: Match): MatchResponse
+    fun deleteMatch(principal: UserPrincipal, matchId: Long, match: Match): MatchResponse
     fun getMatches(pageable: Pageable): Page<MatchResponse>
     fun getAvailableMatchesAndSort(pageable: Pageable, sortCriteria: SortCriteria): Page<MatchResponse>
     fun getMatchesByDateAndRegion(pageable: Pageable, matchDate: LocalDate, region: List<Region>?): Page<MatchResponse>
@@ -33,4 +33,6 @@ interface MatchService2 {
         pageable: Pageable,
         matchStatus: Boolean?
     ): Page<MyTeamMatchResponse>
+
+    fun getMatch(matchId: Long): Match
 }

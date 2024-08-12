@@ -60,6 +60,8 @@ dependencies {
     implementation("com.amazonaws:aws-java-sdk-s3:1.12.741")
     implementation("org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
+    implementation("org.springframework.boot:spring-boot-starter-mail")
+    implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("com.querydsl:querydsl-jpa:$queryDslVersion:jakarta")
@@ -68,6 +70,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")// 액추에이터
     implementation("io.micrometer:micrometer-registry-prometheus") // 프로메테우스 마이크로미터 구현체 추가
 
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.0")
     kapt("com.querydsl:querydsl-apt:$queryDslVersion:jakarta")
     kapt("jakarta.annotation:jakarta.annotation-api")
     kapt("jakarta.persistence:jakarta.persistence-api")
@@ -75,7 +78,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-aop")
 
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
-
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
@@ -87,9 +89,13 @@ dependencies {
     testImplementation("io.mockk:mockk:$mockkVersion")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
+
+
     runtimeOnly("org.postgresql:postgresql")
+    runtimeOnly("com.h2database:h2")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.3")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.3")
+
 }
 
 kotlin {

@@ -1,4 +1,4 @@
-package com.teamsparta.tikitaka.domain.evaluation.service.v3
+package com.teamsparta.tikitaka.domain.evaluation.repository
 
 import com.teamsparta.tikitaka.domain.match.model.SuccessMatch
 import org.springframework.data.jpa.repository.JpaRepository
