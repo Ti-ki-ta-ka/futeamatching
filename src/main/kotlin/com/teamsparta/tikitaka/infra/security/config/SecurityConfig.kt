@@ -46,6 +46,7 @@ class SecurityConfig(
                     "/oauth/**",
                     "/login/oauth2/**",
                     "/my-monitor/**",
+                    "/api/v3/teams/ranks",
 
                     ).permitAll()
                     .anyRequest().authenticated()
