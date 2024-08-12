@@ -33,11 +33,11 @@ class RedisConfig {
         val template = RedisTemplate<String, String>()
         template.keySerializer = StringRedisSerializer()
         template.valueSerializer = StringRedisSerializer()
-        template.setConnectionFactory(lettuceConnectionFactory())
+        template.connectionFactory = lettuceConnectionFactory()
         return template
     }
 
-    @Bean
+    @Bean()
     fun cacheManager(): CacheManager {
         val redisCacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
             .entryTtl(Duration.ofMinutes(1))

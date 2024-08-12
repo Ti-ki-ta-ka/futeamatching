@@ -6,10 +6,13 @@ import com.teamsparta.tikitaka.domain.evaluation.dto.EvaluationRequest
 import com.teamsparta.tikitaka.domain.evaluation.dto.EvaluationResponse
 import com.teamsparta.tikitaka.domain.evaluation.model.Evaluation
 import com.teamsparta.tikitaka.domain.evaluation.repository.EvaluationRepository
+import com.teamsparta.tikitaka.domain.evaluation.repository.SuccessMatchRepository
 import com.teamsparta.tikitaka.domain.match.model.SuccessMatch
 import com.teamsparta.tikitaka.domain.team.repository.TeamRepository
+import com.teamsparta.tikitaka.domain.users.dto.EmailDto
 import com.teamsparta.tikitaka.domain.users.repository.UsersRepository
 import com.teamsparta.tikitaka.infra.security.UserPrincipal
+import jakarta.mail.MessagingException
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -19,8 +22,8 @@ import java.time.LocalDateTime
 class EvaluationServiceImpl(
     private val evaluationRepository: EvaluationRepository,
     private val usersRepository: UsersRepository,
-    private val teamRepository: TeamRepository,
     private val successMatchRepository: SuccessMatchRepository,
+    private val evaluationEmailService: EvaluationEmailService
 ) : EvaluationService {
 
     @Transactional
@@ -68,20 +71,25 @@ class EvaluationServiceImpl(
             teamRepository.save(team)
         }
     }
+    
+    private val verificationEmail = mutableMapOf<String, String>()
 
     @Transactional
-    override fun createEvaluationsForMatch(match: SuccessMatch) {
+    override fun createEvaluationsForMatch(match: SuccessMatch): EmailDto {
+
         val hostTeamEvaluation = Evaluation(
             evaluatorTeamId = match.hostTeamId,
             evaluateeTeamId = match.guestTeamId,
-            evaluatorId = match.guestId,
+            evaluatorId = match.hostId,
             createdAt = LocalDateTime.now(),
+            email = match.hostEmail
         )
         val guestTeamEvaluation = Evaluation(
             evaluatorTeamId = match.guestTeamId,
             evaluateeTeamId = match.hostTeamId,
-            evaluatorId = match.hostId,
+            evaluatorId = match.guestId,
             createdAt = LocalDateTime.now(),
+            email = match.guestEmail
         )
 
         evaluationRepository.save(hostTeamEvaluation)
@@ -90,7 +98,17 @@ class EvaluationServiceImpl(
         match.evaluationCreatedTrue()
         successMatchRepository.save(match)
 
+        val message = evaluationEmailService.sendMessage()
+        verificationEmail[hostTeamEvaluation.email] = message
+        verificationEmail[guestTeamEvaluation.email] = message
 
+        try {
+            evaluationEmailService.sendEmail(hostTeamEvaluation.email, message)
+            evaluationEmailService.sendEmail(guestTeamEvaluation.email, message)
+        } catch (e: MessagingException) {
+            throw IllegalArgumentException("메일 발송 중 오류가 발생했습니다.")
+        }
+        return EmailDto(message)
     }
 
     @Transactional

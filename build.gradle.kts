@@ -6,6 +6,7 @@ plugins {
     kotlin("plugin.noarg") version "1.9.24"
     kotlin("plugin.allopen") version "1.9.24"
     kotlin("kapt") version "1.9.24"
+    id("com.gorylenko.gradle-git-properties") version "2.4.1" // git 모니터링을 위한 플러그인 추가
 }
 
 group = "org.teamsparta"
@@ -59,15 +60,24 @@ dependencies {
     implementation("com.amazonaws:aws-java-sdk-s3:1.12.741")
     implementation("org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
+    implementation("org.springframework.boot:spring-boot-starter-mail")
+    implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
+    implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("com.querydsl:querydsl-jpa:$queryDslVersion:jakarta")
+    implementation("org.springframework.boot:spring-boot-starter-batch:3.0.6")
+    implementation("org.springframework:spring-jdbc")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")// 액추에이터
+    implementation("io.micrometer:micrometer-registry-prometheus") // 프로메테우스 마이크로미터 구현체 추가
+
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.0")
     kapt("com.querydsl:querydsl-apt:$queryDslVersion:jakarta")
     kapt("jakarta.annotation:jakarta.annotation-api")
     kapt("jakarta.persistence:jakarta.persistence-api")
     implementation("org.springframework.boot:spring-boot-starter-batch")
+    implementation("org.springframework.boot:spring-boot-starter-aop")
 
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
-
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
@@ -80,6 +90,7 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
     runtimeOnly("org.postgresql:postgresql")
+    runtimeOnly("com.h2database:h2")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.3")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.3")
 }

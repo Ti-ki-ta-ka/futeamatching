@@ -13,6 +13,7 @@ import com.teamsparta.tikitaka.domain.match.repository.matchapplication.MatchApp
 import com.teamsparta.tikitaka.domain.team.repository.TeamRepository
 import com.teamsparta.tikitaka.domain.team.repository.teamMember.TeamMemberRepository
 import com.teamsparta.tikitaka.domain.users.repository.UsersRepository
+import com.teamsparta.tikitaka.infra.aop.StopWatch
 import com.teamsparta.tikitaka.infra.security.UserPrincipal
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -91,7 +92,7 @@ class MatchServiceImpl2(
         return matchRepository.findAll(pageable)
             .map { match -> MatchResponse.from(match) }
     }
-
+    @StopWatch
     override fun getMatchesByDateAndRegion(
         pageable: Pageable,
         matchDate: LocalDate,
