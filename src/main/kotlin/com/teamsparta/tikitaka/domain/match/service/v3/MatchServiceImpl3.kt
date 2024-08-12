@@ -1,4 +1,4 @@
-package com.teamsparta.tikitaka.domain.match.service.v2
+package com.teamsparta.tikitaka.domain.match.service.v3
 
 import com.teamsparta.tikitaka.domain.common.Region
 import com.teamsparta.tikitaka.domain.common.exception.AccessDeniedException
@@ -16,6 +16,7 @@ import com.teamsparta.tikitaka.domain.team.repository.teamMember.TeamMemberRepos
 import com.teamsparta.tikitaka.domain.users.repository.UsersRepository
 import com.teamsparta.tikitaka.infra.aop.StopWatch
 import com.teamsparta.tikitaka.infra.security.UserPrincipal
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
@@ -26,13 +27,13 @@ import java.time.LocalDate
 
 
 @Service
-class MatchServiceImpl2(
+class MatchServiceImpl3(
     private val matchRepository: MatchRepository,
     private val teamRepository: TeamRepository,
     private val teamMemberRepository: TeamMemberRepository,
     private val usersRepository: UsersRepository,
     private val matchApplicationRepository: MatchApplicationRepository,
-) : MatchService2 {
+) : MatchService3 {
 
     @Transactional
     override fun postMatch(
@@ -103,12 +104,9 @@ class MatchServiceImpl2(
         applications?.forEach { it.delete() }
     }
 
-    override fun getMatches(pageable: Pageable): Page<MatchResponse> {
-        return matchRepository.findAll(pageable)
-            .map { match -> MatchResponse.from(match) }
-    }
 
     @StopWatch
+    @Cacheable("getMatchesByDateAndRegion")
     override fun getMatchesByDateAndRegion(
         pageable: Pageable,
         matchDate: LocalDate,
@@ -120,11 +118,12 @@ class MatchServiceImpl2(
             .map { match -> MatchResponse.from(match) }
     }
 
-
+    @Cacheable("getAvailableMatchesAndSort")
     override fun getAvailableMatchesAndSort(pageable: Pageable, sortCriteria: SortCriteria): Page<MatchResponse> {
         return matchRepository.getAvailableMatchesAndSort(pageable, sortCriteria)
     }
 
+    @Cacheable("getMatchesByRegionAndSort")
     override fun getMatchesByRegionAndSort(
         region: List<Region>,
         pageable: Pageable,
@@ -133,6 +132,7 @@ class MatchServiceImpl2(
         return matchRepository.getMatchesByRegionsAndSort(region, pageable, sortCriteria)
     }
 
+    @Cacheable("getMatchDetails")
     override fun getMatchDetails(
         matchId: Long
     ): MatchResponse {

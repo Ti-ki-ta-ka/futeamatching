@@ -48,7 +48,8 @@ class SecurityConfig(
                     "/api/v3/users/log-in",
                     "/api/v3/users/sign-up",
                     "/api/v3/users/create-code"
-                ).permitAll()
+                    "/my-monitor/**"
+                    ).permitAll()
                     .anyRequest().authenticated()
             }
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)

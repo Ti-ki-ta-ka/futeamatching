@@ -4,8 +4,9 @@ import com.teamsparta.tikitaka.domain.common.exception.AccessDeniedException
 import com.teamsparta.tikitaka.domain.common.exception.ModelNotFoundException
 import com.teamsparta.tikitaka.domain.evaluation.dto.EvaluationRequest
 import com.teamsparta.tikitaka.domain.evaluation.dto.EvaluationResponse
+import com.teamsparta.tikitaka.domain.evaluation.model.Evaluation
 import com.teamsparta.tikitaka.domain.evaluation.repository.EvaluationRepository
-import com.teamsparta.tikitaka.domain.team.repository.TeamRepository
+import com.teamsparta.tikitaka.domain.match.model.SuccessMatch
 import com.teamsparta.tikitaka.domain.users.repository.UsersRepository
 import com.teamsparta.tikitaka.infra.security.UserPrincipal
 import org.springframework.data.repository.findByIdOrNull
@@ -17,7 +18,7 @@ import java.time.LocalDateTime
 class EvaluationServiceImpl(
     private val evaluationRepository: EvaluationRepository,
     private val usersRepository: UsersRepository,
-    private val teamRepository: TeamRepository,
+    private val successMatchRepository: SuccessMatchRepository,
 ) : EvaluationService {
 
     @Transactional
@@ -44,25 +45,33 @@ class EvaluationServiceImpl(
     }
 
     @Transactional
-    override fun calculateAndUpdateScores() {
+    override fun createEvaluationsForMatch(match: SuccessMatch) {
+        val hostTeamEvaluation = Evaluation(
+            evaluatorTeamId = match.hostTeamId,
+            evaluateeTeamId = match.guestTeamId,
+            evaluatorId = match.guestId,
+            createdAt = LocalDateTime.now(),
+        )
+        val guestTeamEvaluation = Evaluation(
+            evaluatorTeamId = match.guestTeamId,
+            evaluateeTeamId = match.hostTeamId,
+            evaluatorId = match.hostId,
+            createdAt = LocalDateTime.now(),
+        )
+
+        evaluationRepository.save(hostTeamEvaluation)
+        evaluationRepository.save(guestTeamEvaluation)
+
+        match.evaluationCreatedTrue()
+        successMatchRepository.save(match)
+
+
+    }
+
+    @Transactional
+    override fun softDeleteOldEvaluations() {
         val now = LocalDateTime.now()
-        val startDate = now.minusDays(90)
-        val endDate = now.withHour(0).withMinute(0).withSecond(0).withNano(0)
-
-        val teams = teamRepository.findAll()
-
-        teams.forEach { team ->
-            val evaluations = evaluationRepository.findEvaluationsForTeamFromLast90Days(team.id!!, startDate, endDate)
-            val totalMannerScore = evaluations.sumOf { it.mannerScore }
-            val totalSkillScore = evaluations.sumOf { it.skillScore }
-            val totalAttendanceScore = evaluations.sumOf { it.attendanceScore }
-            val evaluationCount = evaluations.size
-
-            team.mannerScore = if (evaluationCount == 0) 0 else totalMannerScore
-            team.tierScore = if (evaluationCount == 0) 0 else totalSkillScore
-            team.attendanceScore = if (evaluationCount == 0) 0 else totalAttendanceScore
-
-            teamRepository.save(team)
-        }
+        val threshold = now.minusDays(90)
+        evaluationRepository.softDeleteOldEvaluations(threshold, now)
     }
 }

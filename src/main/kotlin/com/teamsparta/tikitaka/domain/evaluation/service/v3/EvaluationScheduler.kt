@@ -1,4 +1,4 @@
-package com.teamsparta.tikitaka.domain.evaluation.service
+package com.teamsparta.tikitaka.domain.evaluation.service.v3
 
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
@@ -19,5 +19,10 @@ class EvaluationScheduler(
         matches.forEach { match ->
             evaluationService.createEvaluationsForMatch(match)
         }
+    }
+
+    @Scheduled(cron = "0 0 0 * * ?")
+    fun softDeleteOldEvaluations() {
+        evaluationService.softDeleteOldEvaluations()
     }
 }

@@ -1,4 +1,4 @@
-package com.teamsparta.tikitaka.domain.team.service.v2
+package com.teamsparta.tikitaka.domain.team.service.v3
 
 import com.teamsparta.tikitaka.domain.common.exception.AccessDeniedException
 import com.teamsparta.tikitaka.domain.common.exception.ModelNotFoundException
@@ -18,11 +18,11 @@ import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
 @Service
-class LeaderTeamServiceImpl(
+class LeaderTeamServiceImpl3(
     private val teamMemberRepository: TeamMemberRepository,
     private val userRepository: UsersRepository,
     private val teamRepository: TeamRepository,
-) : LeaderTeamService {
+) : LeaderTeamService3 {
 
     @Transactional
     override fun reassignRole(
