@@ -19,9 +19,6 @@ class Users(
     @Column(name = "password")
     var password: String,
 
-    @Column(name = "email_enabled", nullable = false)
-    var emailEnabled: Boolean = false,
-
     @Column(name = "name", nullable = false)
     var name: String,
 

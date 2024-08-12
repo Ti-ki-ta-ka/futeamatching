@@ -111,7 +111,7 @@ class MatchApplicationServiceImpl2(
             matchApplicationId = matchApply.id!!,
             guestTeamId = matchApply.applyTeamId,
             guestId = matchApply.applyUserId,
-            matchDate = LocalDateTime.now(),
+            matchDate = matchPost.matchDate,
             createdAt = LocalDateTime.now(),
             deletedAt = null,
             evaluationCreated = false,
