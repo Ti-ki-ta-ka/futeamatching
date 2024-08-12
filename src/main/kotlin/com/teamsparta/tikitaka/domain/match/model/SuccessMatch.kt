@@ -1,6 +1,11 @@
 package com.teamsparta.tikitaka.domain.match.model
 
-import jakarta.persistence.*
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Id
+import jakarta.persistence.Table
 import org.hibernate.annotations.SQLRestriction
 import java.time.LocalDateTime
 
@@ -34,12 +39,18 @@ class SuccessMatch(
     val createdAt: LocalDateTime,
 
     @Column(name = "deleted_at", nullable = true)
-    val deletedAt: LocalDateTime,
+    val deletedAt: LocalDateTime? = null,
 
     @Column(name = "evaluation_created", nullable = false)
     var evaluationCreated: Boolean = false,
 
-    ) {
+    @Column(name = "host_email", nullable = false)
+    var hostEmail: String,
+
+    @Column(name = "guest_email", nullable = false)
+    var guestEmail: String
+
+) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null

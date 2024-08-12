@@ -1,7 +1,8 @@
-package com.teamsparta.tikitaka.domain.users.controller.v2
+package com.teamsparta.tikitaka.domain.users.controller.v3
 
 import com.teamsparta.tikitaka.domain.recruitment.dto.recruitmentapplication.RecruitmentApplicationResponse
 import com.teamsparta.tikitaka.domain.recruitment.service.v2.recruitmentapplication.RecruitmentApplicationService
+import com.teamsparta.tikitaka.domain.users.dto.CodeResponse
 import com.teamsparta.tikitaka.domain.users.dto.LoginRequest
 import com.teamsparta.tikitaka.domain.users.dto.LoginResponse
 import com.teamsparta.tikitaka.domain.users.dto.NameRequest
@@ -11,7 +12,7 @@ import com.teamsparta.tikitaka.domain.users.dto.PasswordResponse
 import com.teamsparta.tikitaka.domain.users.dto.SignUpRequest
 import com.teamsparta.tikitaka.domain.users.dto.TokenRefreshDto
 import com.teamsparta.tikitaka.domain.users.dto.UserDto
-import com.teamsparta.tikitaka.domain.users.service.v2.UsersService2
+import com.teamsparta.tikitaka.domain.users.service.v3.UsersService3
 import com.teamsparta.tikitaka.infra.security.UserPrincipal
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.http.HttpStatus
@@ -22,21 +23,28 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
-@RequestMapping("/api/v2/users")
+@RequestMapping("/api/v3/users")
 @RestController
-class UsersController2(
-    private val userService: UsersService2,
+class UsersController3(
+    private val userService: UsersService3,
     private val recruitmentApplicationService: RecruitmentApplicationService,
 ) {
+    @PostMapping("/create-code")
+    fun createCode(
+        @RequestParam email: String,
+    ): ResponseEntity<CodeResponse> {
+        return ResponseEntity.ok(userService.createCode(email))
+    }
+
     @PostMapping("/sign-up")
     fun signUp(
-        @RequestBody signUpRequest: SignUpRequest
+        @RequestBody request: SignUpRequest,
+        @RequestParam code: String
     ): ResponseEntity<UserDto> {
-        return ResponseEntity
-            .status(HttpStatus.CREATED)
-            .body(userService.signUp(signUpRequest))
+        return ResponseEntity.ok(userService.signUp(request, code))
     }
 
     @PostMapping("/log-in")
