@@ -90,6 +90,7 @@ class MatchApplicationServiceImpl2(
             matchPost.matchStatus = true
         }
 
+
         return MatchApplicationResponse.from(matchApply)
     }
 
@@ -164,13 +165,10 @@ class MatchApplicationServiceImpl2(
     }
 
     private fun rejectOtherApplications(matchId: Long, approvedApplicationId: Long) {
-        val otherApplications =
-            matchApplicationRepository.findByMatchPostIdAndApproveStatus(matchId, ApproveStatus.WAITING)
-        for (application in otherApplications) {
-            if (application.id != approvedApplicationId) {
-                application.approveStatus = ApproveStatus.REJECT
-            }
-        }
+        matchApplicationRepository.findByMatchPostIdAndApproveStatus(matchId, ApproveStatus.WAITING)
+            .stream()
+            .filter { it.id != approvedApplicationId }
+            .forEach { it.approveStatus = ApproveStatus.REJECT }
     }
 
 }

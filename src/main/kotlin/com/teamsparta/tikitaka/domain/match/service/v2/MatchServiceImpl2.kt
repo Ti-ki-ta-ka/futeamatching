@@ -14,6 +14,7 @@ import com.teamsparta.tikitaka.domain.match.repository.matchapplication.MatchApp
 import com.teamsparta.tikitaka.domain.team.repository.TeamRepository
 import com.teamsparta.tikitaka.domain.team.repository.teamMember.TeamMemberRepository
 import com.teamsparta.tikitaka.domain.users.repository.UsersRepository
+import com.teamsparta.tikitaka.infra.aop.StopWatch
 import com.teamsparta.tikitaka.infra.security.UserPrincipal
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -22,7 +23,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
-import java.time.LocalDateTime
 
 
 @Service
@@ -108,7 +108,12 @@ class MatchServiceImpl2(
             .map { match -> MatchResponse.from(match) }
     }
 
-    override fun getMatchesByDateAndRegion(pageable: Pageable, matchDate: LocalDate, regions: List<Region>?): Page<MatchResponse> {
+    @StopWatch
+    override fun getMatchesByDateAndRegion(
+        pageable: Pageable,
+        matchDate: LocalDate,
+        regions: List<Region>?
+    ): Page<MatchResponse> {
         val startOfDay = matchDate.atStartOfDay()
         val endOfDay = matchDate.atTime(23, 59, 59, 999)
         return matchRepository.findByDateAndRegions(startOfDay, endOfDay, regions, pageable)

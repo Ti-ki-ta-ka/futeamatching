@@ -55,6 +55,9 @@ class Match(
         this.matchStatus = !this.matchStatus
     }
 
+    fun matchingSuccess() {
+        this.matchStatus = true
+    }
 
     companion object {
 
