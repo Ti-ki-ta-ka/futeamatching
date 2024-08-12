@@ -30,6 +30,9 @@ class Team(
     @Column(name = "attendance")
     var attendanceScore: Int = 0,
 
+    @Column(name = "rank")
+    var rank: Long? = null,
+
     @Column(name = "recruit_status", nullable = false)
     var recruitStatus: Boolean = false,
 

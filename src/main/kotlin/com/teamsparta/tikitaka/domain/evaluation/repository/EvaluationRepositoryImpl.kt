@@ -16,7 +16,7 @@ class EvaluationRepositoryImpl : CustomEvaluationRepository, QueryDslSupport() {
             .selectFrom(evaluation)
             .where(
                 evaluation.createdAt.between(startDate, endDate)
-                    .and(evaluation.evaluationStatus.isTrue) // EvaluateStatus가 true인 조건 추가
+                    .and(evaluation.evaluationStatus.isTrue)
             )
             .fetch()
     }

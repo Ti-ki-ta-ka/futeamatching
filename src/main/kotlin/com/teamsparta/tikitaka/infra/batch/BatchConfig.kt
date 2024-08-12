@@ -34,7 +34,7 @@ class BatchConfig(
 
     @Bean
     fun teamEvaluationStep(): Step {
-        return StepBuilder("teamEvaluationStep", jobRepository).chunk<Evaluation, Team>(10, transactionManager)
+        return StepBuilder("teamEvaluationStep", jobRepository).chunk<Evaluation, Team>(100, transactionManager)
             .reader(evaluationItemReader()).processor(evaluationItemProcessor()).writer(teamItemWriter()).build()
     }
 
@@ -82,6 +82,31 @@ class BatchConfig(
     fun teamItemWriter(): ItemWriter<Team> {
         return ItemWriter { teams ->
             teams.forEach { team ->
+                teamRepository.save(team)
+            }
+
+            val teamRanking = teams.sortedByDescending { it.tierScore }
+
+            var currentRank = 1L
+            var previousScore: Int? = null
+            var sameRankCount = 0
+
+            teamRanking.forEach { team ->
+                if (team.tierScore == 0) {
+                    team.rank = null
+                } else {
+                    if (previousScore != null && team.tierScore == previousScore) {
+                        sameRankCount += 1
+                    } else {
+                        currentRank += sameRankCount
+                        sameRankCount = 1
+                    }
+
+                    team.rank = currentRank
+                    previousScore = team.tierScore
+                }
+            }
+            teamRanking.forEach { team ->
                 teamRepository.save(team)
             }
         }
