@@ -2,6 +2,7 @@ package com.teamsparta.tikitaka.domain.match.dto
 
 import com.teamsparta.tikitaka.domain.common.Region
 import com.teamsparta.tikitaka.domain.match.model.Match
+import java.io.Serializable
 import java.time.LocalDateTime
 
 data class MatchResponse(
@@ -17,8 +18,11 @@ data class MatchResponse(
     val matchStatus: Boolean,
     val createdAt: LocalDateTime,
 
-    ) {
+    ) : Serializable {
     companion object {
+
+        private const val serialVersionUID = 1L
+
         fun from(match: Match) = MatchResponse(
             id = match.id!!,
             teamId = match.teamId,

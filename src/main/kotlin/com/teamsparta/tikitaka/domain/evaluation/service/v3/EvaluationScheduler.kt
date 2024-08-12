@@ -20,4 +20,9 @@ class EvaluationScheduler(
             evaluationService.createEvaluationsForMatch(match)
         }
     }
+
+    @Scheduled(cron = "0 0 0 * * ?")
+    fun softDeleteOldEvaluations() {
+        evaluationService.softDeleteOldEvaluations()
+    }
 }

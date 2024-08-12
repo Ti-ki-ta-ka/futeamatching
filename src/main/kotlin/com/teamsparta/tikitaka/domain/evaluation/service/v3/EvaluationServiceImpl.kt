@@ -22,7 +22,6 @@ import java.time.LocalDateTime
 class EvaluationServiceImpl(
     private val evaluationRepository: EvaluationRepository,
     private val usersRepository: UsersRepository,
-    private val teamRepository: TeamRepository,
     private val successMatchRepository: SuccessMatchRepository,
     private val evaluationEmailService: EvaluationEmailService
 ) : EvaluationService {
@@ -77,6 +76,7 @@ class EvaluationServiceImpl(
 
     @Transactional
     override fun createEvaluationsForMatch(match: SuccessMatch): EmailDto {
+
         val hostTeamEvaluation = Evaluation(
             evaluatorTeamId = match.hostTeamId,
             evaluateeTeamId = match.guestTeamId,
@@ -109,5 +109,12 @@ class EvaluationServiceImpl(
             throw IllegalArgumentException("메일 발송 중 오류가 발생했습니다.")
         }
         return EmailDto(message)
+    }
+
+    @Transactional
+    override fun softDeleteOldEvaluations() {
+        val now = LocalDateTime.now()
+        val threshold = now.minusDays(90)
+        evaluationRepository.softDeleteOldEvaluations(threshold, now)
     }
 }
