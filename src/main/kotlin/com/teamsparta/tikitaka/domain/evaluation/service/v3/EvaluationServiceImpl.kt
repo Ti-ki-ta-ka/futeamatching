@@ -49,14 +49,36 @@ class EvaluationServiceImpl(
         evaluation.evaluationStatus = true
         return EvaluationResponse.from(evaluation)
     }
+    
+    override fun calculateAndUpdateScores() {
+        val now = LocalDateTime.now()
+        val startDate = now.minusDays(90)
+        val endDate = now.withHour(0).withMinute(0).withSecond(0).withNano(0)
 
-    private val emailMap = mutableMapOf<String, String>()
+        val teams = teamRepository.findAll()
 
-    @Transactional
+        teams.forEach { team ->
+            val evaluations = evaluationRepository.findEvaluationsForTeamFromLast90Days(team.id!!, startDate, endDate)
+            val totalMannerScore = evaluations.sumOf { it.mannerScore }
+            val totalSkillScore = evaluations.sumOf { it.skillScore }
+            val totalAttendanceScore = evaluations.sumOf { it.attendanceScore }
+            val evaluationCount = evaluations.size
+
+            team.mannerScore = if (evaluationCount == 0) 0 else totalMannerScore
+            team.tierScore = if (evaluationCount == 0) 0 else totalSkillScore
+            team.attendanceScore = if (evaluationCount == 0) 0 else totalAttendanceScore
+
+            teamRepository.save(team)
+        }
+    }
+    
+    private val verificationEmail = mutableMapOf<String, String>()
+
+   @Transactional
     override fun createEvaluationsForMatch(match: SuccessMatch): EmailDto {
         val host = usersRepository.findByIdOrNull(match.hostId)
         val guest = usersRepository.findByIdOrNull(match.guestId)
-
+        
         if (evaluationRepository.existsByEvaluatorIdAndEvaluateeTeamId(match.hostId, match.guestTeamId))
             throw IllegalArgumentException("이미 평가표가 생성 되었습니다")
 
@@ -80,6 +102,7 @@ class EvaluationServiceImpl(
         successMatchRepository.save(match)
 
         val message = evaluationEmailService.sendMessage()
+
         emailMap[host!!.email] = message
         emailMap[guest!!.email] = message
 

@@ -39,8 +39,12 @@ class MatchApplicationController2(
         @PathVariable(name = "match-id") matchId: Long,
         @PathVariable(name = "application-id") applicationId: Long,
     ): ResponseEntity<Unit> {
+        val matchApplication = matchApplicationService.getMatchApplication(applicationId)
+
         matchApplicationService.cancelMatchApplication(principal, matchId, applicationId)
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
+        return preAuthorize.applicationPermission(principal, matchApplication) {
+            ResponseEntity.status(HttpStatus.NO_CONTENT).build()
+        }
     }
 
     @PatchMapping("/{match-id}/match-applications/{application-id}")

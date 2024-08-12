@@ -11,3 +11,4 @@ interface EvaluationService {
     fun createEvaluationsForMatch(match: SuccessMatch): EmailDto
     fun softDeleteOldEvaluations()
 }
+

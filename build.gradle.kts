@@ -70,6 +70,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")// 액추에이터
     implementation("io.micrometer:micrometer-registry-prometheus") // 프로메테우스 마이크로미터 구현체 추가
 
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.0")
     kapt("com.querydsl:querydsl-apt:$queryDslVersion:jakarta")
     kapt("jakarta.annotation:jakarta.annotation-api")
     kapt("jakarta.persistence:jakarta.persistence-api")

@@ -44,7 +44,13 @@ class SuccessMatch(
     @Column(name = "evaluation_created", nullable = false)
     var evaluationCreated: Boolean = false,
 
-    ) {
+    @Column(name = "host_email", nullable = false)
+    var hostEmail: String,
+
+    @Column(name = "guest_email", nullable = false)
+    var guestEmail: String
+
+) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null
