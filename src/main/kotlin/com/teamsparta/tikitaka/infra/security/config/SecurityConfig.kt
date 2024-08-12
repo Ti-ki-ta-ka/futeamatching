@@ -45,8 +45,10 @@ class SecurityConfig(
                     "/api/v2/matches/available",
                     "/oauth/**",
                     "/login/oauth2/**",
-                    "/my-monitor/**",
-
+                    "/api/v3/users/log-in",
+                    "/api/v3/users/sign-up",
+                    "/api/v3/users/create-code"
+                    "/my-monitor/**"
                     ).permitAll()
                     .anyRequest().authenticated()
             }
