@@ -33,4 +33,6 @@ interface MatchApplicationService2 {
     fun getMatchApplications(
         principal: UserPrincipal, matchId: Long, pageable: Pageable, approveStatus: String?
     ): Page<MatchApplicationsByIdResponse>
+
+    fun getMatchApplication(applicationId: Long): MatchApplication
 }
