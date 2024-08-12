@@ -60,6 +60,8 @@ dependencies {
     implementation("com.amazonaws:aws-java-sdk-s3:1.12.741")
     implementation("org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
+    implementation("org.springframework.boot:spring-boot-starter-mail")
+    implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("com.querydsl:querydsl-jpa:$queryDslVersion:jakarta")

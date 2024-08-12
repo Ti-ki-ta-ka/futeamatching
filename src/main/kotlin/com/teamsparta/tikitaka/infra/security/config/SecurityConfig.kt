@@ -50,8 +50,7 @@ class SecurityConfig(
                     "/api/v3/users/create-code",
                     "/api/v2/oauth/**",
                     "/api/v2/login/oauth2/**"
-                    "/my-monitor/**",
-
+                    "/my-monitor/**"
                     ).permitAll()
                     .anyRequest().authenticated()
             }
