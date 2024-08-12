@@ -4,6 +4,7 @@ import com.teamsparta.tikitaka.domain.evaluation.model.Evaluation
 import com.teamsparta.tikitaka.domain.evaluation.repository.EvaluationRepository
 import com.teamsparta.tikitaka.domain.team.model.Team
 import com.teamsparta.tikitaka.domain.team.repository.TeamRepository
+import jakarta.persistence.EntityManagerFactory
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
 import org.springframework.batch.core.configuration.annotation.StepScope
@@ -11,9 +12,7 @@ import org.springframework.batch.core.job.builder.JobBuilder
 import org.springframework.batch.core.repository.JobRepository
 import org.springframework.batch.core.step.builder.StepBuilder
 import org.springframework.batch.item.ItemProcessor
-import org.springframework.batch.item.ItemReader
 import org.springframework.batch.item.ItemWriter
-import org.springframework.batch.item.support.ListItemReader
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -25,7 +24,8 @@ class BatchConfig(
     private val evaluationRepository: EvaluationRepository,
     private val teamRepository: TeamRepository,
     private val jobRepository: JobRepository,
-    private val transactionManager: PlatformTransactionManager
+    private val transactionManager: PlatformTransactionManager,
+    private val entityManagerFactory: EntityManagerFactory
 ) {
 
     @Bean
@@ -36,18 +36,19 @@ class BatchConfig(
     @Bean
     fun teamEvaluationStep(): Step {
         return StepBuilder("teamEvaluationStep", jobRepository).chunk<Evaluation, Team>(100, transactionManager)
-            .reader(evaluationItemReader()).processor(evaluationItemProcessor()).writer(teamItemWriter()).build()
+            .reader(evaluationItemReader(evaluationRepository)).processor(evaluationItemProcessor())
+            .writer(teamItemWriter()).build()
     }
 
     @StepScope
     @Bean
-    fun evaluationItemReader(): ItemReader<Evaluation> {
-        val startDateTime = LocalDateTime.now().minusDays(91)
-        val endDateTime = LocalDateTime.now().minusDays(1)
-
-        val evaluations = evaluationRepository.findEvaluationsBetween(startDateTime, endDateTime)
-
-        return ListItemReader(evaluations)
+    fun evaluationItemReader(evaluationRepository: EvaluationRepository): QuerydslPagingItemReader<Evaluation> {
+        return QuerydslPagingItemReader(
+            entityManagerFactory = entityManagerFactory,
+            queryCreator = { evaluationRepository.findEvaluationsWithPagination() }
+        ).apply {
+            setPageSize(100)
+        }
     }
 
     @StepScope
