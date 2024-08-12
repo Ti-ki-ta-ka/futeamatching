@@ -1,4 +1,4 @@
-package com.teamsparta.tikitaka.domain.match.service.v2.matchapplication2
+package com.teamsparta.tikitaka.domain.match.service.v3.matchapplication3
 
 import com.teamsparta.tikitaka.domain.common.exception.AccessDeniedException
 import com.teamsparta.tikitaka.domain.common.exception.ModelNotFoundException
@@ -25,12 +25,12 @@ import org.springframework.stereotype.Service
 import java.time.LocalDate
 
 @Service
-class MatchApplicationServiceImpl2(
+class MatchApplicationServiceImpl3(
     private val matchApplicationRepository: MatchApplicationRepository,
     private val matchRepository: MatchRepository,
     private val usersRepository: UsersRepository,
     private val teamMemberRepository: TeamMemberRepository
-) : MatchApplicationService2 {
+) : MatchApplicationService3 {
 
     @Transactional
     override fun applyMatch(userId: Long, matchId: Long): MatchApplicationResponse {
@@ -89,7 +89,6 @@ class MatchApplicationServiceImpl2(
             rejectOtherApplications(matchId, applicationId)
             matchPost.matchStatus = true
         }
-
 
         return MatchApplicationResponse.from(matchApply)
     }
@@ -165,10 +164,13 @@ class MatchApplicationServiceImpl2(
     }
 
     private fun rejectOtherApplications(matchId: Long, approvedApplicationId: Long) {
-        matchApplicationRepository.findByMatchPostIdAndApproveStatus(matchId, ApproveStatus.WAITING)
-            .stream()
-            .filter { it.id != approvedApplicationId }
-            .forEach { it.approveStatus = ApproveStatus.REJECT }
+        val otherApplications =
+            matchApplicationRepository.findByMatchPostIdAndApproveStatus(matchId, ApproveStatus.WAITING)
+        for (application in otherApplications) {
+            if (application.id != approvedApplicationId) {
+                application.approveStatus = ApproveStatus.REJECT
+            }
+        }
     }
 
 }

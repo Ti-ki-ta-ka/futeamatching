@@ -1,4 +1,4 @@
-package com.teamsparta.tikitaka.domain.match.controller.v2
+package com.teamsparta.tikitaka.domain.match.controller.v3
 
 import com.teamsparta.tikitaka.domain.common.Region
 import com.teamsparta.tikitaka.domain.match.dto.MatchResponse
@@ -6,7 +6,7 @@ import com.teamsparta.tikitaka.domain.match.dto.MyTeamMatchResponse
 import com.teamsparta.tikitaka.domain.match.dto.PostMatchRequest
 import com.teamsparta.tikitaka.domain.match.dto.UpdateMatchRequest
 import com.teamsparta.tikitaka.domain.match.model.SortCriteria
-import com.teamsparta.tikitaka.domain.match.service.v2.MatchService2
+import com.teamsparta.tikitaka.domain.match.service.v3.MatchService3
 import com.teamsparta.tikitaka.domain.team.model.teammember.TeamRole
 import com.teamsparta.tikitaka.infra.security.CustomPreAuthorize
 import com.teamsparta.tikitaka.infra.security.UserPrincipal
@@ -21,9 +21,9 @@ import org.springframework.web.bind.annotation.*
 import java.time.LocalDate
 
 @RestController
-@RequestMapping("/api/v2/matches")
-class MatchController2(
-    private val matchService: MatchService2,
+@RequestMapping("/api/v3/matches")
+class MatchController3(
+    private val matchService: MatchService3,
     private val preAuthorize: CustomPreAuthorize,
 ) {
     @PostMapping("/create")
