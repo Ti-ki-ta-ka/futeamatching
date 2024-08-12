@@ -114,6 +114,7 @@ class TeamServiceImpl3(
         return TeamResponse.from(team)
     }
 
+    @Cacheable("teamRankRedis", cacheManager = "redisCacheManager")
     override fun getTeamRanks(region: Region?, page: Int, size: Int): Page<TeamRankResponse> {
         val fixedPage = page.coerceAtMost(9)
         val fixedSize = size.coerceAtMost(10)
