@@ -14,6 +14,7 @@ import org.springframework.batch.item.ItemProcessor
 import org.springframework.batch.item.ItemReader
 import org.springframework.batch.item.ItemWriter
 import org.springframework.batch.item.support.ListItemReader
+import org.springframework.cache.annotation.CacheEvict
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.transaction.PlatformTransactionManager
@@ -77,6 +78,7 @@ class BatchConfig(
         }
     }
 
+    @CacheEvict("teamRankRedis", cacheManager = "redisCacheManager", allEntries = true)
     @StepScope
     @Bean
     fun teamItemWriter(): ItemWriter<Team> {
@@ -90,7 +92,6 @@ class BatchConfig(
             var currentRank = 1L
             var previousScore: Int? = null
             var sameRankCount = 0
-
             teamRanking.forEach { team ->
                 if (team.tierScore == 0) {
                     team.rank = null
