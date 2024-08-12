@@ -4,6 +4,7 @@ import com.teamsparta.tikitaka.domain.match.dto.matchapplication.MatchApplicatio
 import com.teamsparta.tikitaka.domain.match.dto.matchapplication.MatchApplicationsByIdResponse
 import com.teamsparta.tikitaka.domain.match.dto.matchapplication.MyApplicationsResponse
 import com.teamsparta.tikitaka.domain.match.dto.matchapplication.ReplyApplicationRequest
+import com.teamsparta.tikitaka.domain.match.model.SuccessMatch
 import com.teamsparta.tikitaka.domain.match.model.matchapplication.MatchApplication
 import com.teamsparta.tikitaka.infra.security.UserPrincipal
 import org.springframework.data.domain.Page
@@ -19,6 +20,11 @@ interface MatchApplicationService2 {
         request: ReplyApplicationRequest
     ): MatchApplicationResponse
 
+    fun successMatch(
+        matchId: Long,
+        applicationId: Long,
+    ): SuccessMatch
+
     fun getMyApplications(userId: Long): List<MyApplicationsResponse>
     fun cancelMatchApplication(
         principal: UserPrincipal, matchId: Long, applicationId: Long
@@ -27,6 +33,4 @@ interface MatchApplicationService2 {
     fun getMatchApplications(
         principal: UserPrincipal, matchId: Long, pageable: Pageable, approveStatus: String?
     ): Page<MatchApplicationsByIdResponse>
-
-    fun getMatchApplication(applicationId: Long): MatchApplication
 }

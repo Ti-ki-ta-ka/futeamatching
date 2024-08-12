@@ -111,5 +111,4 @@ class Match(
             throw RuntimeException("내용이 너무 깁니다.") //todo : custom exception
         }
     }
-
 }

@@ -22,6 +22,7 @@ import java.time.LocalDateTime
 class EvaluationServiceImpl(
     private val evaluationRepository: EvaluationRepository,
     private val usersRepository: UsersRepository,
+    private val teamRepository: TeamRepository,
     private val successMatchRepository: SuccessMatchRepository,
     private val evaluationEmailService: EvaluationEmailService
 ) : EvaluationService {
@@ -48,8 +49,7 @@ class EvaluationServiceImpl(
         evaluation.evaluationStatus = true
         return EvaluationResponse.from(evaluation)
     }
-
-    @Transactional
+    
     override fun calculateAndUpdateScores() {
         val now = LocalDateTime.now()
         val startDate = now.minusDays(90)
@@ -74,22 +74,25 @@ class EvaluationServiceImpl(
     
     private val verificationEmail = mutableMapOf<String, String>()
 
-    @Transactional
+   @Transactional
     override fun createEvaluationsForMatch(match: SuccessMatch): EmailDto {
+        val host = usersRepository.findByIdOrNull(match.hostId)
+        val guest = usersRepository.findByIdOrNull(match.guestId)
+        
+        if (evaluationRepository.existsByEvaluatorIdAndEvaluateeTeamId(match.hostId, match.guestTeamId))
+            throw IllegalArgumentException("이미 평가표가 생성 되었습니다")
 
         val hostTeamEvaluation = Evaluation(
             evaluatorTeamId = match.hostTeamId,
             evaluateeTeamId = match.guestTeamId,
             evaluatorId = match.hostId,
-            createdAt = LocalDateTime.now(),
-            email = match.hostEmail
+            createdAt = LocalDateTime.now()
         )
         val guestTeamEvaluation = Evaluation(
             evaluatorTeamId = match.guestTeamId,
             evaluateeTeamId = match.hostTeamId,
             evaluatorId = match.guestId,
-            createdAt = LocalDateTime.now(),
-            email = match.guestEmail
+            createdAt = LocalDateTime.now()
         )
 
         evaluationRepository.save(hostTeamEvaluation)
@@ -99,12 +102,13 @@ class EvaluationServiceImpl(
         successMatchRepository.save(match)
 
         val message = evaluationEmailService.sendMessage()
-        verificationEmail[hostTeamEvaluation.email] = message
-        verificationEmail[guestTeamEvaluation.email] = message
+
+        emailMap[host!!.email] = message
+        emailMap[guest!!.email] = message
 
         try {
-            evaluationEmailService.sendEmail(hostTeamEvaluation.email, message)
-            evaluationEmailService.sendEmail(guestTeamEvaluation.email, message)
+            evaluationEmailService.sendEmail(host.email, message)
+            evaluationEmailService.sendEmail(guest.email, message)
         } catch (e: MessagingException) {
             throw IllegalArgumentException("메일 발송 중 오류가 발생했습니다.")
         }
