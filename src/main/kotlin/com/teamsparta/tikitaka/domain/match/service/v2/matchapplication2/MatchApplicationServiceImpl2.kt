@@ -49,7 +49,6 @@ class MatchApplicationServiceImpl2(
     override fun cancelMatchApplication(principal: UserPrincipal, matchId: Long, applicationId: Long) {
         findMatchById(matchId)
         val matchApply = findApplicationById(applicationId)
-        validatePermission(principal, matchApply)
         validateCancelable(matchApply)
 
         matchApply.approveStatus = ApproveStatus.CANCELLED
@@ -118,6 +117,11 @@ class MatchApplicationServiceImpl2(
         return applications
     }
 
+    override fun getMatchApplication(applicationId: Long): MatchApplication {
+        val application = findApplicationById(applicationId)
+        return application
+    }
+
     private fun findUserById(userId: Long) =
         usersRepository.findByIdOrNull(userId) ?: throw ModelNotFoundException("User", userId)
 
@@ -155,12 +159,6 @@ class MatchApplicationServiceImpl2(
             ApproveStatus.REJECT, ApproveStatus.APPROVE -> throw IllegalStateException("You cannot cancel an application that has already been approved or rejected.")
             ApproveStatus.CANCELLED -> throw IllegalStateException("You already canceled this application.")
             else -> {}
-        }
-    }
-
-    private fun validatePermission(principal: UserPrincipal, matchApply: MatchApplication) {
-        if (matchApply.applyUserId != principal.id && !principal.authorities.contains(SimpleGrantedAuthority("ROLE_LEADER"))) {
-            throw AccessDeniedException("You do not have permission to cancel.")
         }
     }
 

@@ -43,8 +43,12 @@ class MatchController2(
         @PathVariable(name = "match-id") matchId: Long,
         @RequestBody request: UpdateMatchRequest,
     ): ResponseEntity<MatchResponse> {
-        return ResponseEntity.status(HttpStatus.OK)
-            .body(matchService.updateMatch(principal, matchId, request))
+        val match = matchService.getMatch(matchId)
+
+        return preAuthorize.matchPermission(principal, match) {
+            ResponseEntity.status(HttpStatus.OK)
+                .body(matchService.updateMatch(principal, matchId, request, match))
+        }
     }
 
     @DeleteMapping("/{match-id}")
@@ -52,8 +56,12 @@ class MatchController2(
         @AuthenticationPrincipal principal: UserPrincipal,
         @PathVariable(name = "match-id") matchId: Long,
     ): ResponseEntity<MatchResponse> {
-        return ResponseEntity.status(HttpStatus.NO_CONTENT)
-            .body(matchService.deleteMatch(principal, matchId))
+        val match = matchService.getMatch(matchId)
+
+        return preAuthorize.matchPermission(principal, match) {
+            ResponseEntity.status(HttpStatus.NO_CONTENT)
+                .body(matchService.deleteMatch(principal, matchId, match))
+        }
     }
 
     @GetMapping()
