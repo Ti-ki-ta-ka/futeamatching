@@ -1,19 +1,43 @@
 package com.teamsparta.tikitaka.domain.users.service.v3
 
-import com.teamsparta.tikitaka.domain.users.dto.EmailDto
+import com.teamsparta.tikitaka.domain.common.util.RedisUtils
 import jakarta.mail.internet.MimeMessage
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.stereotype.Service
+import org.thymeleaf.context.Context
+import org.thymeleaf.spring6.SpringTemplateEngine
+import org.thymeleaf.templatemode.TemplateMode
+import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver
+import java.security.MessageDigest
+import java.time.LocalDateTime
 import kotlin.random.Random
 
 @Service
 class EmailServiceImpl(
     private val javaMailSender: JavaMailSender,
-    @Value("\${spring.mail.username}") private val sendEmail: String
+    private val redisUtils: RedisUtils,
+    @Value("\${spring.mail.username}") private val sendEmail: String,
+    private val mailSender: JavaMailSender
 ) : EmailService {
+    override fun setContext(code: String): String {
+        val context = Context()
+        val templateEngine = SpringTemplateEngine()
+        val templateResolver = ClassLoaderTemplateResolver()
 
-    override fun createNumber(): String {
+        context.setVariable("code", code)
+
+        templateResolver.prefix = "templates/"
+        templateResolver.suffix = ".html"
+        templateResolver.templateMode = TemplateMode.HTML
+        templateResolver.isCacheable = false
+
+        templateEngine.setTemplateResolver(templateResolver)
+
+        return templateEngine.process("mail", context)
+    }
+
+    override fun createEMail(email: String): MimeMessage {
         val key = StringBuilder()
 
         repeat(8) {
@@ -25,39 +49,40 @@ class EmailServiceImpl(
                 2 -> key.append(Random.nextInt(10)) // 숫자
             }
         }
-        return key.toString()
-    }
 
-    override fun createEMail(email: String?, number: String?): MimeMessage {
         val message: MimeMessage = javaMailSender.createMimeMessage()
-
         message.setFrom(sendEmail)
         message.setRecipients(MimeMessage.RecipientType.TO, email)
         message.subject = "futeamatching 이메일 인증"
         val body = """
             <h3>요청하신 인증 번호입니다.</h3>
-            <h1>$number</h1>
+            <h1>$key</h1>
             <h3>감사합니다.</h3>
         """.trimIndent()
         message.setText(body, "UTF-8", "html")
+        redisUtils.setDataExpireEmail(email, key.toString(), 10 * 60L)
 
         return message
     }
 
-    override fun sendVerificationEmail(email: String, number: String) {
-        val message = createEMail(email, number)
-        try {
-            javaMailSender.send(message)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            throw IllegalArgumentException("메일 발송 중 오류가 발생했습니다.")
+    override fun sendEmail(email: String) {
+        if (redisUtils.existData(email)) {
+            redisUtils.deleteData(email)
         }
+
+        val emailForm = createEMail(email)
+        mailSender.send(emailForm)
     }
 
-    override fun emailCheck(request: EmailDto): String {
-        val authCode = createNumber()
-        sendVerificationEmail(request.email, authCode)
+    override fun verificationEmail(email: String, number: String): Boolean {
+        val codeFoundByEmail = redisUtils.getData(email)
+        return codeFoundByEmail?.equals(number) ?: false
+    }
 
-        return authCode
+    override fun makeMemberId(email: String): String {
+        val md = MessageDigest.getInstance("SHA-256")
+        md.update(email.toByteArray())
+        md.update(LocalDateTime.now().toString().toByteArray())
+        return md.digest().joinToString("") { String.format("%02x", it) }
     }
 }

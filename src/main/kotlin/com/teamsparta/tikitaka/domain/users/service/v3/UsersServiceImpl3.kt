@@ -1,11 +1,9 @@
 package com.teamsparta.tikitaka.domain.users.service.v3
 
-import com.teamsparta.tikitaka.domain.common.exception.AccessDeniedException
 import com.teamsparta.tikitaka.domain.common.exception.InvalidCredentialException
 import com.teamsparta.tikitaka.domain.common.exception.ModelNotFoundException
 import com.teamsparta.tikitaka.domain.common.util.RedisUtils
 import com.teamsparta.tikitaka.domain.team.repository.teamMember.TeamMemberRepository
-import com.teamsparta.tikitaka.domain.users.dto.CodeResponse
 import com.teamsparta.tikitaka.domain.users.dto.LoginRequest
 import com.teamsparta.tikitaka.domain.users.dto.LoginResponse
 import com.teamsparta.tikitaka.domain.users.dto.NameRequest
@@ -18,7 +16,6 @@ import com.teamsparta.tikitaka.domain.users.model.Users
 import com.teamsparta.tikitaka.domain.users.repository.UsersRepository
 import com.teamsparta.tikitaka.infra.security.UserPrincipal
 import com.teamsparta.tikitaka.infra.security.jwt.JwtPlugin
-import jakarta.mail.MessagingException
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
@@ -33,23 +30,6 @@ class UsersServiceImpl3(
     private val redisUtils: RedisUtils,
     private val emailService: EmailService
 ) : UsersService3 {
-
-    private val verificationCodes = mutableMapOf<String, String>() // 이 부분은 추후에 수정할 예정
-
-    override fun createCode(
-        email: String
-    ): CodeResponse {
-        val authCode = emailService.createNumber()
-        verificationCodes[email] = authCode
-
-        try {
-            emailService.sendVerificationEmail(email, authCode)
-        } catch (e: MessagingException) {
-            throw IllegalArgumentException("메일 발송 중 오류가 발생했습니다.")
-        }
-        return CodeResponse(authCode)
-    }
-
     @Transactional
     override fun signUp(
         request: SignUpRequest,
@@ -74,15 +54,15 @@ class UsersServiceImpl3(
                 name = request.name
             )
         )
-
-        val validCode =
-            verificationCodes[request.email] ?: throw AccessDeniedException("인증된 이메일이 아닙니다")
-        if (validCode != code) {
-            throw InvalidCredentialException("유효하지 않거나 만료된 인증 코드입니다.")
-        }
-        verificationCodes.remove(request.email)
-        val enabled = usersRepository.findByEmail(request.email)
-        usersRepository.save(enabled!!)
+        //
+        // val validCode =
+        //     verificationCodes[request.email] ?: throw AccessDeniedException("인증된 이메일이 아닙니다")
+        // if (validCode != code) {
+        //     throw InvalidCredentialException("유효하지 않거나 만료된 인증 코드입니다.")
+        // }
+        // verificationCodes.remove(request.email)
+        // val enabled = usersRepository.findByEmail(request.email)
+        // usersRepository.save(enabled!!)
 
         return UserDto.fromEntity(user)
     }

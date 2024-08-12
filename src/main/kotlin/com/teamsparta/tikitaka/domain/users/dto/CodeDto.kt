@@ -1,5 +1,5 @@
 package com.teamsparta.tikitaka.domain.users.dto
 
-data class CodeResponse(
+data class CodeDto(
     val code: String
 )

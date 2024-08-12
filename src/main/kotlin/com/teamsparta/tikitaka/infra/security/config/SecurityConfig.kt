@@ -50,9 +50,9 @@ class SecurityConfig(
                     "/api/v3/weather/**",
                     "/api/v3/users/log-in",
                     "/api/v3/users/sign-up",
-                    "/api/v3/users/create-code",
+                    "/api/v3/users/create-code/**",
                     "/api/v2/oauth/**",
-                    "/api/v2/login/oauth2/**"
+                    "/api/v2/login/oauth2/**",
                 ).permitAll()
                     .anyRequest().authenticated()
             }

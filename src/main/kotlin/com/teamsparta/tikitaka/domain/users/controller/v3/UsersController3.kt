@@ -2,7 +2,7 @@ package com.teamsparta.tikitaka.domain.users.controller.v3
 
 import com.teamsparta.tikitaka.domain.recruitment.dto.recruitmentapplication.RecruitmentApplicationResponse
 import com.teamsparta.tikitaka.domain.recruitment.service.v2.recruitmentapplication.RecruitmentApplicationService
-import com.teamsparta.tikitaka.domain.users.dto.CodeResponse
+import com.teamsparta.tikitaka.domain.users.dto.CodeDto
 import com.teamsparta.tikitaka.domain.users.dto.LoginRequest
 import com.teamsparta.tikitaka.domain.users.dto.LoginResponse
 import com.teamsparta.tikitaka.domain.users.dto.NameRequest
@@ -12,6 +12,7 @@ import com.teamsparta.tikitaka.domain.users.dto.PasswordResponse
 import com.teamsparta.tikitaka.domain.users.dto.SignUpRequest
 import com.teamsparta.tikitaka.domain.users.dto.TokenRefreshDto
 import com.teamsparta.tikitaka.domain.users.dto.UserDto
+import com.teamsparta.tikitaka.domain.users.service.v3.EmailService
 import com.teamsparta.tikitaka.domain.users.service.v3.UsersService3
 import com.teamsparta.tikitaka.infra.security.UserPrincipal
 import jakarta.servlet.http.HttpServletRequest
@@ -19,6 +20,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -31,12 +33,26 @@ import org.springframework.web.bind.annotation.RestController
 class UsersController3(
     private val userService: UsersService3,
     private val recruitmentApplicationService: RecruitmentApplicationService,
+    private val emailService: EmailService
 ) {
-    @PostMapping("/create-code")
+    @GetMapping("/create-code")
     fun createCode(
         @RequestParam email: String,
-    ): ResponseEntity<CodeResponse> {
-        return ResponseEntity.ok(userService.createCode(email))
+    ): ResponseEntity<String> {
+        emailService.sendEmail(email)
+        return ResponseEntity.ok("이메일을 확인하세요")
+    }
+
+    @PostMapping("/create-code/{email}")
+    fun sendEmailAndCode(
+        @PathVariable email: String,
+        @RequestBody dto: CodeDto
+    ): ResponseEntity<String> {
+        return if (emailService.verificationEmail(email, dto.code)) {
+            ResponseEntity.ok(emailService.makeMemberId(email))
+        } else {
+            ResponseEntity.notFound().build()
+        }
     }
 
     @PostMapping("/sign-up")
