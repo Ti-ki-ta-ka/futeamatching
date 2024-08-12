@@ -107,8 +107,38 @@ class BatchConfig(
                     previousScore = team.tierScore
                 }
             }
+
             teamRanking.forEach { team ->
                 teamRepository.save(team)
+            }
+
+            val teamsByRegion = teams.groupBy { it.region }
+
+            teamsByRegion.forEach { (region, regionTeams) ->
+                val regionRanking = regionTeams.sortedByDescending { it.tierScore }
+
+                var regionCurrentRank = 1L
+                var regionPreviousScore: Int? = null
+                var regionSameRankCount = 0
+
+                regionRanking.forEach { team ->
+                    if (team.tierScore == 0) {
+                        team.regionRank = null
+                    } else {
+                        if (regionPreviousScore != null && team.tierScore == regionPreviousScore) {
+                            regionSameRankCount += 1
+                        } else {
+                            regionCurrentRank += regionSameRankCount
+                            regionSameRankCount = 1
+                        }
+
+                        team.regionRank = regionCurrentRank
+                        regionPreviousScore = team.tierScore
+                    }
+                }
+                regionRanking.forEach { team ->
+                    teamRepository.save(team)
+                }
             }
         }
     }

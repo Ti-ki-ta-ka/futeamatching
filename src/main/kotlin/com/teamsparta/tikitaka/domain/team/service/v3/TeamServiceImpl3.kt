@@ -119,7 +119,13 @@ class TeamServiceImpl3(
         val fixedPage = page.coerceAtMost(9)
         val fixedSize = size.coerceAtMost(10)
 
-        val pageable = PageRequest.of(fixedPage, fixedSize, Sort.by(Sort.Direction.ASC, "rank"))
+        val sort = if (region != null) {
+            Sort.by(Sort.Direction.ASC, "regionRank")
+        } else {
+            Sort.by(Sort.Direction.ASC, "rank")
+        }
+
+        val pageable = PageRequest.of(fixedPage, fixedSize, sort)
 
         val teams = if (region != null) {
             teamRepository.findByRegionAndRankIsNotNull(region, pageable)
@@ -133,6 +139,7 @@ class TeamServiceImpl3(
                 name = team.name,
                 tierScore = team.tierScore,
                 rank = team.rank,
+                regionRank = team.regionRank,
                 region = team.region.name
             )
         }
