@@ -12,6 +12,7 @@ data class TeamResponse(
     val tierScore: Int,
     val mannerScore: Int,
     val attendanceScore: Int,
+    val rank: Long?,
     val recruitStatus: Boolean,
     val region: String,
     val createAt: LocalDateTime
@@ -31,6 +32,7 @@ data class TeamResponse(
                 team.tierScore,
                 team.mannerScore,
                 team.attendanceScore,
+                team.rank,
                 team.recruitStatus,
                 team.region.name,
                 team.createdAt

@@ -1,9 +1,12 @@
 package com.teamsparta.tikitaka.domain.team.service.v3
 
+import com.teamsparta.tikitaka.domain.common.Region
 import com.teamsparta.tikitaka.domain.team.dto.request.TeamRequest
 import com.teamsparta.tikitaka.domain.team.dto.response.PageResponse
+import com.teamsparta.tikitaka.domain.team.dto.response.TeamRankResponse
 import com.teamsparta.tikitaka.domain.team.dto.response.TeamResponse
 import com.teamsparta.tikitaka.infra.security.UserPrincipal
+import org.springframework.data.domain.Page
 
 interface TeamService3 {
 
@@ -19,11 +22,8 @@ interface TeamService3 {
     fun getTeam(teamId: Long): TeamResponse
 
     fun searchTeamListByName(
-        region: String?,
-        page: Int,
-        size: Int,
-        sortBy: String,
-        direction: String,
-        name: String
+        region: String?, page: Int, size: Int, sortBy: String, direction: String, name: String
     ): PageResponse<TeamResponse>
+
+    fun getTeamRanks(region: Region?, page: Int, size: Int): Page<TeamRankResponse>
 }

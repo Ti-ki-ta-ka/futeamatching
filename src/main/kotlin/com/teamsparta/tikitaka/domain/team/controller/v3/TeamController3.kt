@@ -1,13 +1,16 @@
 package com.teamsparta.tikitaka.domain.team.controller.v3
 
 
+import com.teamsparta.tikitaka.domain.common.Region
 import com.teamsparta.tikitaka.domain.team.dto.request.TeamRequest
 import com.teamsparta.tikitaka.domain.team.dto.response.PageResponse
+import com.teamsparta.tikitaka.domain.team.dto.response.TeamRankResponse
 import com.teamsparta.tikitaka.domain.team.dto.response.TeamResponse
 import com.teamsparta.tikitaka.domain.team.model.teammember.TeamRole
 import com.teamsparta.tikitaka.domain.team.service.v3.TeamService3
 import com.teamsparta.tikitaka.infra.security.CustomPreAuthorize
 import com.teamsparta.tikitaka.infra.security.UserPrincipal
+import org.springframework.data.domain.Page
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -83,5 +86,12 @@ class TeamController3(
         return ResponseEntity.status(HttpStatus.OK).body(teamService.getTeam(teamId))
     }
 
-
+    @GetMapping("/ranks")
+    fun getTeamRanks(
+        @RequestParam("region", required = false) region: Region?,
+        @RequestParam("page", defaultValue = "0") page: Int,
+        @RequestParam("size", defaultValue = "10") size: Int,
+    ): ResponseEntity<Page<TeamRankResponse>> {
+        return ResponseEntity.status(HttpStatus.OK).body(teamService.getTeamRanks(region, page, size))
+    }
 }
