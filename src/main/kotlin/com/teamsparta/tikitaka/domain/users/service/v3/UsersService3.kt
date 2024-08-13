@@ -1,6 +1,5 @@
 package com.teamsparta.tikitaka.domain.users.service.v3
 
-import com.teamsparta.tikitaka.domain.users.dto.CodeResponse
 import com.teamsparta.tikitaka.domain.users.dto.LoginRequest
 import com.teamsparta.tikitaka.domain.users.dto.LoginResponse
 import com.teamsparta.tikitaka.domain.users.dto.NameRequest
@@ -12,7 +11,6 @@ import com.teamsparta.tikitaka.domain.users.dto.UserDto
 import com.teamsparta.tikitaka.infra.security.UserPrincipal
 
 interface UsersService3 {
-    fun createCode(email: String): CodeResponse
     fun signUp(request: SignUpRequest, code: String): UserDto
     fun logIn(request: LoginRequest): LoginResponse
     fun logOut(token: String)
