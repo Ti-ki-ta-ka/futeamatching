@@ -8,5 +8,5 @@ data class NaverUserResponse(
     @JsonProperty("name")
     val name: String,
     @JsonProperty("email")
-    val email: String
+    val email: String?
 )

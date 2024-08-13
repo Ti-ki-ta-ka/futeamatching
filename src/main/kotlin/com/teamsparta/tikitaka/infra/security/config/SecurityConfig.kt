@@ -45,14 +45,14 @@ class SecurityConfig(
                     "/api/v2/matches/available",
                     "/oauth/**",
                     "/login/oauth2/**",
-                    "/api/v2/login/oauth2/code/kakao",
+                    "/api/v2/login/oauth2/code/**",
                     "/favicon.ico",
                     "/resources/**",
                     "/static/**",
                     "/public/**",
                     "/webui/**",
                     "/h2-console/**",
-                    "/api/v2/oauth/kakako"
+                    "/api/v2/oauth/**"
                 ).permitAll()
                     .anyRequest().authenticated()
             }

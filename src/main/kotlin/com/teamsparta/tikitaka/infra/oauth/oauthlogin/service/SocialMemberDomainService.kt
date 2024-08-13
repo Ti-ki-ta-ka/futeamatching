@@ -29,7 +29,7 @@ class SocialMemberDomainService(
             Users(
                 oAuthProvider = "NAVER",
                 name = userInfo.response.name,
-                email = userInfo.response.email,
+                email = "empty",
                 image = "",
                 oAuthProviderId = userInfo.response.id,
                 password = ""
