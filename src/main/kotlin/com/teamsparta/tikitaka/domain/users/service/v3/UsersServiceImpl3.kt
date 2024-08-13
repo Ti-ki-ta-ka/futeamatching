@@ -30,6 +30,7 @@ class UsersServiceImpl3(
     private val redisUtils: RedisUtils,
     private val emailService: EmailService
 ) : UsersService3 {
+  
     @Transactional
     override fun signUp(
         request: SignUpRequest,
@@ -54,16 +55,6 @@ class UsersServiceImpl3(
                 name = request.name
             )
         )
-        //
-        // val validCode =
-        //     verificationCodes[request.email] ?: throw AccessDeniedException("인증된 이메일이 아닙니다")
-        // if (validCode != code) {
-        //     throw InvalidCredentialException("유효하지 않거나 만료된 인증 코드입니다.")
-        // }
-        // verificationCodes.remove(request.email)
-        // val enabled = usersRepository.findByEmail(request.email)
-        // usersRepository.save(enabled!!)
-
         return UserDto.fromEntity(user)
     }
 

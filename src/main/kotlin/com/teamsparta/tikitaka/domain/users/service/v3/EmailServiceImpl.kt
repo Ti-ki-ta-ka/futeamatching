@@ -1,6 +1,8 @@
 package com.teamsparta.tikitaka.domain.users.service.v3
 
+
 import com.teamsparta.tikitaka.domain.common.util.RedisUtils
+import com.teamsparta.tikitaka.domain.users.dto.EmailDto
 import jakarta.mail.internet.MimeMessage
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.mail.javamail.JavaMailSender
@@ -17,13 +19,13 @@ import kotlin.random.Random
 class EmailServiceImpl(
     private val javaMailSender: JavaMailSender,
     private val redisUtils: RedisUtils,
-    @Value("\${spring.mail.username}") private val sendEmail: String,
-    private val mailSender: JavaMailSender
+    @Value("\${spring.mail.username}") private val sendEmail: String
 ) : EmailService {
     override fun setContext(code: String): String {
         val context = Context()
         val templateEngine = SpringTemplateEngine()
         val templateResolver = ClassLoaderTemplateResolver()
+
 
         context.setVariable("code", code)
 
@@ -71,9 +73,9 @@ class EmailServiceImpl(
         }
 
         val emailForm = createEMail(email)
-        mailSender.send(emailForm)
+        javaMailSender.send(emailForm)
     }
-
+    
     override fun verificationEmail(email: String, number: String): Boolean {
         val codeFoundByEmail = redisUtils.getData(email)
         return codeFoundByEmail?.equals(number) ?: false
