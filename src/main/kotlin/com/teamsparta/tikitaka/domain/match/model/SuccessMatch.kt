@@ -34,7 +34,7 @@ class SuccessMatch(
     val createdAt: LocalDateTime,
 
     @Column(name = "deleted_at", nullable = true)
-    val deletedAt: LocalDateTime,
+    val deletedAt: LocalDateTime? = null,
 
     @Column(name = "evaluation_created", nullable = false)
     var evaluationCreated: Boolean = false,

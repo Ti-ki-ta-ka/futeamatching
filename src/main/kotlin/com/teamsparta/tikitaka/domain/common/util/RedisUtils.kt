@@ -1,6 +1,7 @@
 package com.teamsparta.tikitaka.domain.common.util
 
 import org.springframework.data.redis.core.RedisTemplate
+import org.springframework.data.redis.core.ValueOperations
 import org.springframework.stereotype.Component
 import java.time.Duration
 import java.util.concurrent.TimeUnit
@@ -47,5 +48,15 @@ class RedisUtils(
     fun deleteByUserId(userId: String) {
         val keys = redisTemplate.keys("$KEY_PREFIX:$userId:*")
         redisTemplate.delete(keys)
+    }
+
+    fun existData(key: String): Boolean {
+        return redisTemplate.hasKey(key)
+    }
+
+    fun setDataExpireEmail(key: String, value: String, duration: Long) {
+        val valueOperations: ValueOperations<String, String> = redisTemplate.opsForValue()
+        val expireDuration = Duration.ofSeconds(duration)
+        valueOperations.set(key, value, expireDuration)
     }
 }

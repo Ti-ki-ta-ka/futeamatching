@@ -3,11 +3,13 @@ package com.teamsparta.tikitaka.domain.match.service.v2.matchapplication2
 import com.teamsparta.tikitaka.domain.common.exception.AccessDeniedException
 import com.teamsparta.tikitaka.domain.common.exception.ModelNotFoundException
 import com.teamsparta.tikitaka.domain.common.exception.TeamAlreadyAppliedException
+import com.teamsparta.tikitaka.domain.evaluation.repository.SuccessMatchRepository
 import com.teamsparta.tikitaka.domain.match.dto.matchapplication.MatchApplicationResponse
 import com.teamsparta.tikitaka.domain.match.dto.matchapplication.MatchApplicationsByIdResponse
 import com.teamsparta.tikitaka.domain.match.dto.matchapplication.MyApplicationsResponse
 import com.teamsparta.tikitaka.domain.match.dto.matchapplication.ReplyApplicationRequest
 import com.teamsparta.tikitaka.domain.match.model.Match
+import com.teamsparta.tikitaka.domain.match.model.SuccessMatch
 import com.teamsparta.tikitaka.domain.match.model.matchapplication.ApproveStatus
 import com.teamsparta.tikitaka.domain.match.model.matchapplication.MatchApplication
 import com.teamsparta.tikitaka.domain.match.repository.MatchRepository
@@ -23,13 +25,15 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.stereotype.Service
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 @Service
 class MatchApplicationServiceImpl2(
     private val matchApplicationRepository: MatchApplicationRepository,
     private val matchRepository: MatchRepository,
     private val usersRepository: UsersRepository,
-    private val teamMemberRepository: TeamMemberRepository
+    private val teamMemberRepository: TeamMemberRepository,
+    private val successMatchRepository: SuccessMatchRepository
 ) : MatchApplicationService2 {
 
     @Transactional
@@ -49,7 +53,6 @@ class MatchApplicationServiceImpl2(
     override fun cancelMatchApplication(principal: UserPrincipal, matchId: Long, applicationId: Long) {
         findMatchById(matchId)
         val matchApply = findApplicationById(applicationId)
-        validatePermission(principal, matchApply)
         validateCancelable(matchApply)
 
         matchApply.approveStatus = ApproveStatus.CANCELLED
@@ -88,10 +91,32 @@ class MatchApplicationServiceImpl2(
         if (matchApply.approveStatus == ApproveStatus.APPROVE) {
             rejectOtherApplications(matchId, applicationId)
             matchPost.matchStatus = true
+            successMatch(matchId, applicationId)
         }
 
 
         return MatchApplicationResponse.from(matchApply)
+    }
+
+    override fun successMatch(
+        matchId: Long,
+        applicationId: Long
+    ): SuccessMatch {
+        val matchPost = findMatchById(matchId)
+        val matchApply = findApplicationById(applicationId)
+        val matchSuccess = SuccessMatch(
+            matchPostId = matchPost.id!!,
+            hostTeamId = matchPost.teamId,
+            hostId = matchPost.userId,
+            matchApplicationId = matchApply.id!!,
+            guestTeamId = matchApply.applyTeamId,
+            guestId = matchApply.applyUserId,
+            matchDate = matchPost.matchDate,
+            createdAt = LocalDateTime.now(),
+            deletedAt = null,
+            evaluationCreated = false,
+        )
+        return successMatchRepository.save(matchSuccess)
     }
 
     override fun getMyApplications(userId: Long): List<MyApplicationsResponse> {
@@ -116,6 +141,11 @@ class MatchApplicationServiceImpl2(
         val applications =
             matchApplicationRepository.findApplicationsByMatchId(pageable, matchId, approveStatus)
         return applications
+    }
+
+    override fun getMatchApplication(applicationId: Long): MatchApplication {
+        val application = findApplicationById(applicationId)
+        return application
     }
 
     private fun findUserById(userId: Long) =
@@ -158,17 +188,10 @@ class MatchApplicationServiceImpl2(
         }
     }
 
-    private fun validatePermission(principal: UserPrincipal, matchApply: MatchApplication) {
-        if (matchApply.applyUserId != principal.id && !principal.authorities.contains(SimpleGrantedAuthority("ROLE_LEADER"))) {
-            throw AccessDeniedException("You do not have permission to cancel.")
-        }
-    }
-
     private fun rejectOtherApplications(matchId: Long, approvedApplicationId: Long) {
         matchApplicationRepository.findByMatchPostIdAndApproveStatus(matchId, ApproveStatus.WAITING)
             .stream()
             .filter { it.id != approvedApplicationId }
             .forEach { it.approveStatus = ApproveStatus.REJECT }
     }
-
 }

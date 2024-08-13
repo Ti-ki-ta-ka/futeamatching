@@ -1,5 +1,6 @@
 package com.teamsparta.tikitaka.domain.evaluation.service.v3
 
+import com.teamsparta.tikitaka.domain.evaluation.repository.SuccessMatchRepository
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -10,7 +11,7 @@ class EvaluationScheduler(
     private val evaluationService: EvaluationService,
 ) {
 
-    @Scheduled(fixedRate = 30000)
+    @Scheduled(fixedRate = 600000)
     fun createEvaluations() {
         val now = LocalDateTime.now()
         val twoHoursAgo = now.minusHours(2)

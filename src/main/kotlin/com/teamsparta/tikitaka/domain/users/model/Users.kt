@@ -1,17 +1,12 @@
 package com.teamsparta.tikitaka.domain.users.model
 
 import com.teamsparta.tikitaka.domain.common.exception.InvalidCredentialException
-import com.teamsparta.tikitaka.domain.team.model.teammember.TeamRole
-import com.teamsparta.tikitaka.infra.security.UserPrincipal
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
-import org.springframework.security.core.authority.SimpleGrantedAuthority
-import org.springframework.security.core.context.SecurityContextHolder
 import java.time.LocalDateTime
 import java.util.regex.Pattern
 
