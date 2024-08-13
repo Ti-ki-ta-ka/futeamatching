@@ -37,7 +37,7 @@ class BatchConfig(
         performanceListener: ReaderPerformanceListener
     ): Step {
         return StepBuilder("teamEvaluationStep", jobRepository).chunk<Evaluation, Team>(100, transactionManager)
-            .reader(evaluationItemReader(evaluationRepository)).processor(evaluationItemProcessor())
+            .reader(evaluationItemReader(evaluationRepository)).processor(evaluationItemProcessor(teamRepository))
             .writer(teamItemWriter()).listener(performanceListener).build()
     }
 
@@ -52,20 +52,18 @@ class BatchConfig(
 
     @StepScope
     @Bean
-    fun evaluationItemProcessor(): ItemProcessor<Evaluation, Team> {
+    fun evaluationItemProcessor(teamRepository: TeamRepository): ItemProcessor<Evaluation, Team> {
         return ItemProcessor { evaluation ->
             val teamId = evaluation.evaluateeTeamId
+            val team = teamRepository.findById(teamId).orElseThrow { ModelNotFoundException("Team", teamId) }
 
-            val team = teamRepository.findById(teamId).orElseThrow { ModelNotFoundException("team", teamId) }
-
-            team.mannerScore = evaluation.mannerScore
-            team.tierScore = evaluation.skillScore
-            team.attendanceScore = evaluation.attendanceScore
+            team.mannerScore += evaluation.mannerScore
+            team.tierScore += evaluation.skillScore
+            team.attendanceScore += evaluation.attendanceScore
 
             team
         }
     }
-
 
     @StepScope
     @Bean
@@ -73,60 +71,6 @@ class BatchConfig(
         return ItemWriter { teams ->
             teams.forEach { team ->
                 teamRepository.save(team)
-            }
-
-            val teamRanking = teams.sortedByDescending { it.tierScore }
-
-            var currentRank = 1L
-            var previousScore: Int? = null
-            var sameRankCount = 0
-            teamRanking.forEach { team ->
-                if (team.tierScore == 0) {
-                    team.rank = null
-                } else {
-                    if (previousScore != null && team.tierScore == previousScore) {
-                        sameRankCount += 1
-                    } else {
-                        currentRank += sameRankCount
-                        sameRankCount = 1
-                    }
-
-                    team.rank = currentRank
-                    previousScore = team.tierScore
-                }
-            }
-
-            teamRanking.forEach { team ->
-                teamRepository.save(team)
-            }
-
-            val teamsByRegion = teams.groupBy { it.region }
-
-            teamsByRegion.forEach { (region, regionTeams) ->
-                val regionRanking = regionTeams.sortedByDescending { it.tierScore }
-
-                var regionCurrentRank = 1L
-                var regionPreviousScore: Int? = null
-                var regionSameRankCount = 0
-
-                regionRanking.forEach { team ->
-                    if (team.tierScore == 0) {
-                        team.regionRank = null
-                    } else {
-                        if (regionPreviousScore != null && team.tierScore == regionPreviousScore) {
-                            regionSameRankCount += 1
-                        } else {
-                            regionCurrentRank += regionSameRankCount
-                            regionSameRankCount = 1
-                        }
-
-                        team.regionRank = regionCurrentRank
-                        regionPreviousScore = team.tierScore
-                    }
-                }
-                regionRanking.forEach { team ->
-                    teamRepository.save(team)
-                }
             }
         }
     }

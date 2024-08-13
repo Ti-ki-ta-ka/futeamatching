@@ -9,15 +9,6 @@ import java.time.LocalDateTime
 
 @Repository
 class EvaluationRepositoryImpl : CustomEvaluationRepository, QueryDslSupport() {
-
-    override fun findEvaluationsBetween(startDate: LocalDateTime, endDate: LocalDateTime): List<Evaluation> {
-        val evaluation = QEvaluation.evaluation
-
-        return queryFactory.selectFrom(evaluation).where(
-            evaluation.evaluationStatus.isTrue
-        ).fetch()
-    }
-
     override fun softDeleteOldEvaluations(threshold: LocalDateTime, now: LocalDateTime) {
         val evaluation = QEvaluation.evaluation
         queryFactory.update(evaluation).set(evaluation.deletedAt, now).where(
