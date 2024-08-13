@@ -57,7 +57,7 @@ class EvaluationServiceImpl(
 
         if (evaluationRepository.existsByEvaluatorIdAndEvaluateeTeamId(match.hostId, match.guestTeamId))
             throw IllegalArgumentException("이미 평가표가 생성 되었습니다")
-
+            
         val hostTeamEvaluation = Evaluation(
             evaluatorTeamId = match.hostTeamId,
             evaluateeTeamId = match.guestTeamId,

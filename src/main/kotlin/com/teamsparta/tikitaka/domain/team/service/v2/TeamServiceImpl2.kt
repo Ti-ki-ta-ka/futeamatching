@@ -9,6 +9,8 @@ import com.teamsparta.tikitaka.domain.team.model.teammember.TeamMember
 import com.teamsparta.tikitaka.domain.team.model.teammember.TeamRole
 import com.teamsparta.tikitaka.domain.team.repository.TeamRepository
 import com.teamsparta.tikitaka.domain.team.repository.teamMember.TeamMemberRepository
+import com.teamsparta.tikitaka.domain.users.dto.UserDto
+import com.teamsparta.tikitaka.domain.users.dto.UserResponse
 import com.teamsparta.tikitaka.domain.users.repository.UsersRepository
 import com.teamsparta.tikitaka.infra.security.UserPrincipal
 import org.springframework.data.domain.PageRequest
@@ -127,8 +129,30 @@ class TeamServiceImpl2(
         return TeamResponse.from(team)
     }
 
+    override fun getMyTeam(userPrincipal: UserPrincipal): TeamResponse {
+        val teamMember = teamMemberRepository.findByUserId(userPrincipal.id)
+        return TeamResponse.from(teamMember.team)
+    }
+
     private fun getDirection(direction: String) = when (direction) {
         "asc" -> Sort.Direction.ASC
         else -> Sort.Direction.DESC
+    }
+
+    override fun getMyTeamMembers(userPrincipal: UserPrincipal): List<UserResponse> {
+        val teamMember = teamMemberRepository.findByUserId(userPrincipal.id)
+        val teamMembers = teamMemberRepository.findByTeamId(teamMember.team.id!!)
+
+
+        return teamMembers!!.mapNotNull { member ->
+            val user = usersRepository.findById(member.userId).orElse(null)
+            user?.let { UserResponse(
+                userId = it.id!!,
+                email = it.email,
+                name = it.name,
+                role = member.teamRole,
+                createdAt = it.createdAt
+            ) }
+        }
     }
 }
