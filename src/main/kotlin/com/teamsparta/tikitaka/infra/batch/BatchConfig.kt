@@ -1,5 +1,6 @@
 package com.teamsparta.tikitaka.infra.batch
 
+import com.teamsparta.tikitaka.domain.common.exception.ModelNotFoundException
 import com.teamsparta.tikitaka.domain.evaluation.model.Evaluation
 import com.teamsparta.tikitaka.domain.evaluation.repository.EvaluationRepository
 import com.teamsparta.tikitaka.domain.team.model.Team
@@ -55,9 +56,7 @@ class BatchConfig(
         return ItemProcessor { evaluation ->
             val teamId = evaluation.evaluateeTeamId
 
-            val team = teamRepository.findById(teamId).orElseThrow {
-                IllegalArgumentException("Team not found for teamId: $teamId")
-            }
+            val team = teamRepository.findById(teamId).orElseThrow { ModelNotFoundException("team", teamId) }
 
             team.mannerScore = evaluation.mannerScore
             team.tierScore = evaluation.skillScore
