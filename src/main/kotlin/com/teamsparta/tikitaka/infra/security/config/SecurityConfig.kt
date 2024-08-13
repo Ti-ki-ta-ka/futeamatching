@@ -45,6 +45,13 @@ class SecurityConfig(
                     "/api/v2/matches/available",
                     "/oauth/**",
                     "/login/oauth2/**",
+                    "/api/v2/login/oauth2/code/**",
+                    "/favicon.ico",
+                    "/resources/**",
+                    "/static/**",
+                    "/public/**",
+                    "/webui/**",
+                    "/h2-console/**",
                     "/my-monitor/**",
                     "/api/v3/teams/ranks",
                     "/api/v3/weather/**",
@@ -53,6 +60,7 @@ class SecurityConfig(
                     "/api/v3/users/create-code/**",
                     "/api/v2/oauth/**",
                     "/api/v2/login/oauth2/**",
+
                 ).permitAll()
                     .anyRequest().authenticated()
             }

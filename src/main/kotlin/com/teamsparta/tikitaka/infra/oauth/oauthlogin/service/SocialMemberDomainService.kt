@@ -11,16 +11,17 @@ class SocialMemberDomainService(
     private val usersRepository: UsersRepository
 ) {
     fun registerIfAbsentKakao(userInfo: KakaoOAuthUserInfo): Users {
-        return usersRepository.findByOAuthProviderId(userInfo.id.toString()) ?: usersRepository.save(
-            Users(
-                oAuthProvider = "KAKAO",
-                name = userInfo.kakaoAccount.profile.nickname,
-                email = userInfo.kakaoAccount.accountEmail,
-                image = userInfo.kakaoAccount.profile.image,
-                oAuthProviderId = userInfo.id.toString(),
-                password = ""
+        return usersRepository.findByOAuthProviderId(userInfo.id.toString())
+            ?: usersRepository.save(
+                Users(
+                    oAuthProvider = "KAKAO",
+                    name = userInfo.kakaoAccount.profile.nickname ?: "Unknown",
+                    email = "empty",
+                    image = userInfo.kakaoAccount.profile.image ?: "",
+                    oAuthProviderId = userInfo.id.toString(),
+                    password = ""
+                )
             )
-        )
     }
 
     fun registerIfAbsentNaver(userInfo: NaverOAuthUserInfo): Users {
@@ -28,7 +29,7 @@ class SocialMemberDomainService(
             Users(
                 oAuthProvider = "NAVER",
                 name = userInfo.response.name,
-                email = userInfo.response.email,
+                email = "empty",
                 image = "",
                 oAuthProviderId = userInfo.response.id,
                 password = ""
