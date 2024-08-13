@@ -52,7 +52,15 @@ class SecurityConfig(
                     "/public/**",
                     "/webui/**",
                     "/h2-console/**",
-                    "/api/v2/oauth/**"
+                    "/my-monitor/**",
+                    "/api/v3/teams/ranks",
+                    "/api/v3/weather/**",
+                    "/api/v3/users/log-in",
+                    "/api/v3/users/sign-up",
+                    "/api/v3/users/create-code/**",
+                    "/api/v2/oauth/**",
+                    "/api/v2/login/oauth2/**",
+
                 ).permitAll()
                     .anyRequest().authenticated()
             }

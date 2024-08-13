@@ -8,7 +8,7 @@ import com.teamsparta.tikitaka.domain.team.model.teammember.TeamMember
 import com.teamsparta.tikitaka.infra.security.UserPrincipal
 
 
-interface LeaderTeamService {
+interface LeaderTeamService2 {
 
     fun reassignRole(principal: UserPrincipal, teamMemberId: Long, request: ReassignRoleRequest): ReassignRoleResponse
     fun delegateLeader(principal: UserPrincipal, teamMemberId: Long): DelegateLeaderResponse
