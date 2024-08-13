@@ -13,11 +13,9 @@ import org.springframework.batch.core.repository.JobRepository
 import org.springframework.batch.core.step.builder.StepBuilder
 import org.springframework.batch.item.ItemProcessor
 import org.springframework.batch.item.ItemWriter
-import org.springframework.cache.annotation.CacheEvict
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.transaction.PlatformTransactionManager
-import java.time.LocalDateTime
 
 @Configuration
 class BatchConfig(
@@ -34,19 +32,19 @@ class BatchConfig(
     }
 
     @Bean
-    fun teamEvaluationStep(): Step {
+    fun teamEvaluationStep(
+        performanceListener: ReaderPerformanceListener
+    ): Step {
         return StepBuilder("teamEvaluationStep", jobRepository).chunk<Evaluation, Team>(100, transactionManager)
             .reader(evaluationItemReader(evaluationRepository)).processor(evaluationItemProcessor())
-            .writer(teamItemWriter()).build()
+            .writer(teamItemWriter()).listener(performanceListener).build()
     }
 
     @StepScope
     @Bean
     fun evaluationItemReader(evaluationRepository: EvaluationRepository): QuerydslPagingItemReader<Evaluation> {
-        return QuerydslPagingItemReader(
-            entityManagerFactory = entityManagerFactory,
-            queryCreator = { evaluationRepository.findEvaluationsWithPagination() }
-        ).apply {
+        return QuerydslPagingItemReader(entityManagerFactory = entityManagerFactory,
+            queryCreator = { evaluationRepository.findEvaluationsWithPagination() }).apply {
             setPageSize(100)
         }
     }
@@ -61,25 +59,15 @@ class BatchConfig(
                 IllegalArgumentException("Team not found for teamId: $teamId")
             }
 
-            val evaluations = evaluationRepository.findEvaluationsBetween(
-                LocalDateTime.now().minusDays(91), LocalDateTime.now().minusDays(1)
-            ).filter { it.evaluateeTeamId == teamId }
-
-            team.mannerScore = 0
-            team.tierScore = 0
-            team.attendanceScore = 0
-
-            evaluations.forEach { eval ->
-                team.mannerScore += eval.mannerScore
-                team.tierScore += eval.skillScore
-                team.attendanceScore += eval.attendanceScore
-            }
+            team.mannerScore = evaluation.mannerScore
+            team.tierScore = evaluation.skillScore
+            team.attendanceScore = evaluation.attendanceScore
 
             team
         }
     }
 
-    @CacheEvict("teamRankRedis", cacheManager = "redisCacheManager", allEntries = true)
+
     @StepScope
     @Bean
     fun teamItemWriter(): ItemWriter<Team> {
@@ -142,5 +130,10 @@ class BatchConfig(
                 }
             }
         }
+    }
+
+    @Bean
+    fun readerPerformanceListener(): ReaderPerformanceListener {
+        return ReaderPerformanceListener()
     }
 }
