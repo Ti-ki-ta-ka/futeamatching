@@ -40,9 +40,16 @@ class RedisConfig {
     @Bean()
     fun cacheManager(): CacheManager {
         val redisCacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
-            .entryTtl(Duration.ofMinutes(1))
+            .entryTtl(Duration.ofMinutes(10))
+
+        val teamRankCacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
+            .entryTtl(Duration.ofDays(1))
+
+        val cacheConfigurations = mapOf("teamRankRedis" to teamRankCacheConfiguration)
+
         return RedisCacheManager.builder(lettuceConnectionFactory())
             .cacheDefaults(redisCacheConfiguration)
+            .withInitialCacheConfigurations(cacheConfigurations)
             .build()
     }
 }

@@ -33,6 +33,9 @@ class Team(
     @Column(name = "rank")
     var rank: Long? = null,
 
+    @Column(name = "region_rank")
+    var regionRank: Long? = null,
+
     @Column(name = "recruit_status", nullable = false)
     var recruitStatus: Boolean = false,
 

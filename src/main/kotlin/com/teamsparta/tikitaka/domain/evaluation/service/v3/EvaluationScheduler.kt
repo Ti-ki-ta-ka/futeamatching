@@ -11,7 +11,7 @@ class EvaluationScheduler(
     private val evaluationService: EvaluationService,
 ) {
 
-    @Scheduled(fixedRate = 30000)
+    @Scheduled(fixedRate = 600000)
     fun createEvaluations() {
         val now = LocalDateTime.now()
         val twoHoursAgo = now.minusHours(2)
