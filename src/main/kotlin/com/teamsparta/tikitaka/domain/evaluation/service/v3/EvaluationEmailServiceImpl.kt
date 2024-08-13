@@ -2,16 +2,17 @@ package com.teamsparta.tikitaka.domain.evaluation.service.v3
 
 import com.teamsparta.tikitaka.domain.users.dto.EmailDto
 import jakarta.mail.internet.MimeMessage
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.stereotype.Service
 
 @Service
 class EvaluationEmailServiceImpl(
     private val javaMailSender: JavaMailSender,
+    @Value("\${spring.mail.username}") private val sendEmail: String
 ) : EvaluationEmailService {
-    private val sendEmail = "tikitakaad1111@gmail.com"
-    override fun sendMessage(): String {
 
+    override fun sendMessage(): String {
         val body = """
             <h3>경기가 완료되었습니다</h3>
             <h3>상대팀을 평가해 주세요</h3>

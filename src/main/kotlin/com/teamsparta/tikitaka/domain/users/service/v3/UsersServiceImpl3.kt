@@ -34,7 +34,7 @@ class UsersServiceImpl3(
     private val emailService: EmailService
 ) : UsersService3 {
 
-    private val verificationCodes = mutableMapOf<String, String>()
+    private val verificationCodes = mutableMapOf<String, String>() // 이 부분은 추후에 수정할 예정
 
     override fun createCode(
         email: String
@@ -82,7 +82,6 @@ class UsersServiceImpl3(
         }
         verificationCodes.remove(request.email)
         val enabled = usersRepository.findByEmail(request.email)
-        enabled?.emailEnabled = true
         usersRepository.save(enabled!!)
 
         return UserDto.fromEntity(user)
@@ -90,7 +89,6 @@ class UsersServiceImpl3(
 
     override fun logIn(request: LoginRequest): LoginResponse {
         val user = usersRepository.findByEmail(request.email) ?: throw ModelNotFoundException("Users", null)
-        if (!user.emailEnabled) throw AccessDeniedException("이메일 인증이 되지 않았습니다")
         if (!passwordEncoder.matches(request.password, user.password)) {
             throw InvalidCredentialException("비밀번호가 일치하지 않습니다")
         }

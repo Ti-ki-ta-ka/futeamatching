@@ -1,7 +1,8 @@
 package com.teamsparta.tikitaka.domain.users.service.v3
 
-import com.teamsparta.tikitaka.domain.users.dto.EmailRequest
+import com.teamsparta.tikitaka.domain.users.dto.EmailDto
 import jakarta.mail.internet.MimeMessage
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.stereotype.Service
 import kotlin.random.Random
@@ -9,8 +10,8 @@ import kotlin.random.Random
 @Service
 class EmailServiceImpl(
     private val javaMailSender: JavaMailSender,
+    @Value("\${spring.mail.username}") private val sendEmail: String
 ) : EmailService {
-    private val sendEmail = "tikitakaad1111@gmail.com"
 
     override fun createNumber(): String {
         val key = StringBuilder()
@@ -53,7 +54,7 @@ class EmailServiceImpl(
         }
     }
 
-    override fun emailCheck(request: EmailRequest): String {
+    override fun emailCheck(request: EmailDto): String {
         val authCode = createNumber()
         sendVerificationEmail(request.email, authCode)
 
