@@ -2,6 +2,7 @@ package com.teamsparta.tikitaka.infra.batch
 
 import com.teamsparta.tikitaka.domain.common.exception.ModelNotFoundException
 import com.teamsparta.tikitaka.domain.evaluation.model.Evaluation
+import com.teamsparta.tikitaka.domain.evaluation.model.QEvaluation.evaluation
 import com.teamsparta.tikitaka.domain.evaluation.repository.EvaluationRepository
 import com.teamsparta.tikitaka.domain.team.model.Team
 import com.teamsparta.tikitaka.domain.team.repository.TeamRepository
@@ -82,14 +83,21 @@ class BatchConfig(
             .writer(teamItemWriter()).listener(performanceListener).build()
     }
 
-    @StepScope
     @Bean
-    fun evaluationItemReader(evaluationRepository: EvaluationRepository): QuerydslPagingItemReader<Evaluation> {
-        return QuerydslPagingItemReader(entityManagerFactory = entityManagerFactory,
-            queryCreator = { evaluationRepository.findEvaluationsWithPagination() }).apply {
+    fun evaluationItemReader(evaluationRepository: EvaluationRepository): QuerydslZeroOffsetItemReader<Evaluation> {
+        return QuerydslZeroOffsetItemReader(entityManagerFactory = entityManagerFactory,
+            queryCreator = { queryFactory, lastId ->
+                val query = evaluationRepository.findEvaluationsWithPagination(queryFactory)
+                lastId?.let {
+                    query.where(evaluation.id.gt(it))
+                }
+                query
+            },
+            idExtractor = { it.id as Long }).apply {
             setPageSize(100)
         }
     }
+
 
     @StepScope
     @Bean
