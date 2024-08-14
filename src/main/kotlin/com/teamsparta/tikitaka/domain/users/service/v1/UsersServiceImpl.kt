@@ -51,14 +51,6 @@ class UsersServiceImpl(
             throw InvalidCredentialException("비밀번호가 일치하지 않습니다")
         }
 
-        val role = when {
-            user.teamStatus -> {
-                val teamMember = teamMemberRepository.findByUserId(user.id!!)
-                teamMember.teamRole.name
-            }
-
-            else -> null
-        }
         val accessToken = jwtPlugin.generateAccessToken(
             subject = user.id.toString(),
             email = user.email,
@@ -68,7 +60,12 @@ class UsersServiceImpl(
             email = user.email,
         )
         redisUtils.saveRefreshToken(refreshToken)
-        return LoginResponse(userId = user.id!!, userName = user.name,accessToken = accessToken, refreshToken = refreshToken)
+        return LoginResponse(
+            userId = user.id!!,
+            userName = user.name,
+            accessToken = accessToken,
+            refreshToken = refreshToken
+        )
     }
 
     override fun logOut(token: String) {
