@@ -43,7 +43,7 @@ class UsersServiceImpl3(
 
         val isVerified = redisUtils.isVerifiedEmail(request.email)
         if (!isVerified) {
-            throw InvalidCredentialException("이메일 인증이 필요합니다.")
+            throw InvalidCredentialException("인증이 만료되었거나 이메일 인증이 되지 않았습니다")
         }
 
         with(Users) {
