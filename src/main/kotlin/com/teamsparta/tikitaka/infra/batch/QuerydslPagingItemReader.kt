@@ -26,8 +26,7 @@ open class QuerydslPagingItemReader<T>(
     override fun doReadPage() {
         clearIfTransacted()
 
-        val query = createQuery().offset((page * pageSize).toLong())
-            .limit(pageSize.toLong())
+        val query = createQuery().offset((page * pageSize).toLong()).limit(pageSize.toLong())
 
         initResults()
         fetchQuery(query)

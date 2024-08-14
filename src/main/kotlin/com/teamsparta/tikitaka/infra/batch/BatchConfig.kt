@@ -13,6 +13,7 @@ import org.springframework.batch.core.job.builder.JobBuilder
 import org.springframework.batch.core.repository.JobRepository
 import org.springframework.batch.core.step.builder.StepBuilder
 import org.springframework.batch.item.ItemProcessor
+import org.springframework.batch.item.ItemReader
 import org.springframework.batch.item.ItemWriter
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -28,13 +29,53 @@ class BatchConfig(
 ) {
 
     @Bean
-    fun teamEvaluationJob(teamEvaluationStep: Step): Job {
-        return JobBuilder("teamEvaluationJob", jobRepository).start(teamEvaluationStep).build()
+    fun teamEvaluationJob(clearTeamScoresStep: Step, teamEvaluationStep: Step): Job {
+        return JobBuilder("teamEvaluationJob", jobRepository).start(clearTeamScoresStep).next(teamEvaluationStep)
+            .build()
+    }
+
+    @Bean
+    fun clearTeamScoresStep(): Step {
+        return StepBuilder("clearTeamScoresStep", jobRepository).chunk<Team, Team>(100, transactionManager)
+            .reader(clearTeamScoresItemReader()).processor(clearTeamScoresItemProcessor())
+            .writer(clearTeamScoresItemWriter()).build()
+    }
+
+    @StepScope
+    @Bean
+    fun clearTeamScoresItemReader(): ItemReader<Team> {
+        val teams = teamRepository.findAll().iterator()
+        return ItemReader {
+            if (teams.hasNext()) {
+                teams.next()
+            } else {
+                null
+            }
+        }
+    }
+
+    @StepScope
+    @Bean
+    fun clearTeamScoresItemProcessor(): ItemProcessor<Team, Team> {
+        return ItemProcessor { team ->
+            team.mannerScore = 0
+            team.tierScore = 0
+            team.attendanceScore = 0
+            team
+        }
+    }
+
+    @StepScope
+    @Bean
+    fun clearTeamScoresItemWriter(): ItemWriter<Team> {
+        return ItemWriter { teams ->
+            teamRepository.saveAll(teams)
+        }
     }
 
     @Bean
     fun teamEvaluationStep(
-        performanceListener: ReaderPerformanceListener
+        performanceListener: StepPerformanceListener
     ): Step {
         return StepBuilder("teamEvaluationStep", jobRepository).chunk<Evaluation, Team>(100, transactionManager)
             .reader(evaluationItemReader(evaluationRepository)).processor(evaluationItemProcessor(teamRepository))
@@ -69,14 +110,12 @@ class BatchConfig(
     @Bean
     fun teamItemWriter(): ItemWriter<Team> {
         return ItemWriter { teams ->
-            teams.forEach { team ->
-                teamRepository.save(team)
-            }
+            teamRepository.saveAll(teams)
         }
     }
 
     @Bean
-    fun readerPerformanceListener(): ReaderPerformanceListener {
-        return ReaderPerformanceListener()
+    fun stepPerformanceListener(): StepPerformanceListener {
+        return StepPerformanceListener()
     }
 }
