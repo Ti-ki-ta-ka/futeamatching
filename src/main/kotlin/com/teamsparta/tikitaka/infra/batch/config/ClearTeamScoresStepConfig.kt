@@ -1,4 +1,4 @@
-package com.teamsparta.tikitaka.infra.batch
+package com.teamsparta.tikitaka.infra.batch.config
 
 import com.teamsparta.tikitaka.domain.team.model.Team
 import com.teamsparta.tikitaka.domain.team.repository.TeamRepository

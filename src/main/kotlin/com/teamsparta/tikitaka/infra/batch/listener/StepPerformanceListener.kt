@@ -1,4 +1,4 @@
-package com.teamsparta.tikitaka.infra.batch
+package com.teamsparta.tikitaka.infra.batch.listener
 
 import org.slf4j.LoggerFactory
 import org.springframework.batch.core.ExitStatus

@@ -1,4 +1,4 @@
-package com.teamsparta.tikitaka.infra.batch
+package com.teamsparta.tikitaka.infra.batch.reader
 
 import com.querydsl.jpa.impl.JPAQuery
 import com.querydsl.jpa.impl.JPAQueryFactory
