@@ -11,7 +11,7 @@ import org.springframework.scheduling.annotation.Scheduled
 @EnableScheduling
 class SchedulingConfig(
     private val jobLauncher: JobLauncher,
-    private val teamEvaluationJob: Job // Job의 이름을 명시적으로 변경
+    private val teamEvaluationJob: Job
 ) {
 
     @Scheduled(cron = "0 0 1 * * ?")
