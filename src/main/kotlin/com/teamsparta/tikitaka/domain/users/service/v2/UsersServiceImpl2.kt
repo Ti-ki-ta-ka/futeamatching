@@ -4,14 +4,7 @@ import com.teamsparta.tikitaka.domain.common.exception.InvalidCredentialExceptio
 import com.teamsparta.tikitaka.domain.common.exception.ModelNotFoundException
 import com.teamsparta.tikitaka.domain.common.util.RedisUtils
 import com.teamsparta.tikitaka.domain.team.repository.teamMember.TeamMemberRepository
-import com.teamsparta.tikitaka.domain.users.dto.LoginRequest
-import com.teamsparta.tikitaka.domain.users.dto.LoginResponse
-import com.teamsparta.tikitaka.domain.users.dto.NameRequest
-import com.teamsparta.tikitaka.domain.users.dto.NameResponse
-import com.teamsparta.tikitaka.domain.users.dto.PasswordRequest
-import com.teamsparta.tikitaka.domain.users.dto.PasswordResponse
-import com.teamsparta.tikitaka.domain.users.dto.SignUpRequest
-import com.teamsparta.tikitaka.domain.users.dto.UserDto
+import com.teamsparta.tikitaka.domain.users.dto.*
 import com.teamsparta.tikitaka.domain.users.model.Users
 import com.teamsparta.tikitaka.domain.users.repository.UsersRepository
 import com.teamsparta.tikitaka.infra.security.UserPrincipal
@@ -58,14 +51,6 @@ class UsersServiceImpl2(
             throw InvalidCredentialException("비밀번호가 일치하지 않습니다")
         }
 
-        val role = when {
-            user.teamStatus -> {
-                val teamMember = teamMemberRepository.findByUserId(user.id!!)
-                teamMember.teamRole.name
-            }
-
-            else -> null
-        }
         val accessToken = jwtPlugin.generateAccessToken(
             subject = user.id.toString(),
             email = user.email,
