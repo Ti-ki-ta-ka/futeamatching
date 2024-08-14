@@ -2,21 +2,24 @@ package com.teamsparta.tikitaka.infra.batch
 
 import com.querydsl.jpa.impl.JPAQuery
 import com.querydsl.jpa.impl.JPAQueryFactory
+import com.teamsparta.tikitaka.domain.evaluation.model.QEvaluation
 import jakarta.persistence.EntityManager
 import jakarta.persistence.EntityManagerFactory
 import org.springframework.batch.item.database.AbstractPagingItemReader
 import org.springframework.util.CollectionUtils
 import java.util.concurrent.CopyOnWriteArrayList
 
-open class QuerydslPagingItemReader<T>(
-    private val entityManagerFactory: EntityManagerFactory, val queryCreator: (JPAQueryFactory) -> JPAQuery<T>
+open class QuerydslZeroOffsetItemReader<T>(
+    private val entityManagerFactory: EntityManagerFactory,
+    val queryCreator: (JPAQueryFactory, Long?) -> JPAQuery<T>,
+    private val idExtractor: (T) -> Long
 ) : AbstractPagingItemReader<T>() {
 
     private lateinit var entityManager: EntityManager
-
     private val jpaPropertyMap = mutableMapOf<String, Any>()
+    private var lastId: Long? = null
+    private val idPath = QEvaluation.evaluation.id
     var transacted = true
-    var pageOffset = true
 
     override fun doOpen() {
         super.doOpen()
@@ -26,14 +29,11 @@ open class QuerydslPagingItemReader<T>(
     override fun doReadPage() {
         clearIfTransacted()
 
-        val query = createQuery().offset((page * pageSize).toLong()).limit(pageSize.toLong())
+        val query = createQuery().limit(pageSize.toLong())
 
         initResults()
         fetchQuery(query)
-
-        if (results.isEmpty()) {
-            results = null
-        }
+        updateLastId()
     }
 
     private fun clearIfTransacted() {
@@ -42,7 +42,13 @@ open class QuerydslPagingItemReader<T>(
         }
     }
 
-    private fun createQuery(): JPAQuery<T> = queryCreator(JPAQueryFactory(entityManager))
+    private fun createQuery(): JPAQuery<T> {
+        val query = queryCreator(JPAQueryFactory(entityManager), lastId)
+        lastId?.let {
+            query.where(idPath.gt(it))
+        }
+        return query
+    }
 
     private fun initResults() {
         if (CollectionUtils.isEmpty(results)) {
@@ -64,12 +70,14 @@ open class QuerydslPagingItemReader<T>(
         }
     }
 
+    private fun updateLastId() {
+        if (results.isNotEmpty()) {
+            lastId = idExtractor(results.last())
+        }
+    }
+
     override fun doClose() {
         entityManager.close()
         super.doClose()
-    }
-
-    override fun getPageSize(): Int {
-        return if (pageOffset) super.getPageSize() else 0
     }
 }
