@@ -44,7 +44,7 @@ class UsersController3(
     }
 
     @PostMapping("/create-code/{email}")
-    fun sendEmailAndCode(
+    fun emailVerified(
         @PathVariable email: String,
         @RequestBody dto: CodeDto
     ): ResponseEntity<String> {
