@@ -1,16 +1,10 @@
 package com.teamsparta.tikitaka.domain.users.service.v3
 
-
 import com.teamsparta.tikitaka.domain.common.util.RedisUtils
-import com.teamsparta.tikitaka.domain.users.dto.EmailDto
 import jakarta.mail.internet.MimeMessage
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.stereotype.Service
-import org.thymeleaf.context.Context
-import org.thymeleaf.spring6.SpringTemplateEngine
-import org.thymeleaf.templatemode.TemplateMode
-import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver
 import java.security.MessageDigest
 import java.time.LocalDateTime
 import kotlin.random.Random
@@ -21,23 +15,6 @@ class EmailServiceImpl(
     private val redisUtils: RedisUtils,
     @Value("\${spring.mail.username}") private val sendEmail: String
 ) : EmailService {
-    override fun setContext(code: String): String {
-        val context = Context()
-        val templateEngine = SpringTemplateEngine()
-        val templateResolver = ClassLoaderTemplateResolver()
-
-
-        context.setVariable("code", code)
-
-        templateResolver.prefix = "templates/"
-        templateResolver.suffix = ".html"
-        templateResolver.templateMode = TemplateMode.HTML
-        templateResolver.isCacheable = false
-
-        templateEngine.setTemplateResolver(templateResolver)
-
-        return templateEngine.process("mail", context)
-    }
 
     override fun createEMail(email: String): MimeMessage {
         val key = StringBuilder()
@@ -75,7 +52,7 @@ class EmailServiceImpl(
         val emailForm = createEMail(email)
         javaMailSender.send(emailForm)
     }
-    
+
     override fun verificationEmail(email: String, number: String): Boolean {
         val codeFoundByEmail = redisUtils.getData(email)
         return codeFoundByEmail?.equals(number) ?: false
