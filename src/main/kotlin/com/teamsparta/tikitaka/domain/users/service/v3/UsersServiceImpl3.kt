@@ -3,8 +3,14 @@ package com.teamsparta.tikitaka.domain.users.service.v3
 import com.teamsparta.tikitaka.domain.common.exception.InvalidCredentialException
 import com.teamsparta.tikitaka.domain.common.exception.ModelNotFoundException
 import com.teamsparta.tikitaka.domain.common.util.RedisUtils
-import com.teamsparta.tikitaka.domain.team.repository.teamMember.TeamMemberRepository
-import com.teamsparta.tikitaka.domain.users.dto.*
+import com.teamsparta.tikitaka.domain.users.dto.LoginRequest
+import com.teamsparta.tikitaka.domain.users.dto.LoginResponse
+import com.teamsparta.tikitaka.domain.users.dto.NameRequest
+import com.teamsparta.tikitaka.domain.users.dto.NameResponse
+import com.teamsparta.tikitaka.domain.users.dto.PasswordRequest
+import com.teamsparta.tikitaka.domain.users.dto.PasswordResponse
+import com.teamsparta.tikitaka.domain.users.dto.SignUpRequest
+import com.teamsparta.tikitaka.domain.users.dto.UserDto
 import com.teamsparta.tikitaka.domain.users.model.Users
 import com.teamsparta.tikitaka.domain.users.repository.UsersRepository
 import com.teamsparta.tikitaka.infra.security.UserPrincipal
@@ -18,23 +24,28 @@ import org.springframework.transaction.annotation.Transactional
 class UsersServiceImpl3(
     private val usersRepository: UsersRepository,
     private val passwordEncoder: PasswordEncoder,
-    private val teamMemberRepository: TeamMemberRepository,
     private val jwtPlugin: JwtPlugin,
-    private val redisUtils: RedisUtils,
-    private val emailService: EmailService
+    private val redisUtils: RedisUtils
 ) : UsersService3 {
 
     @Transactional
     override fun signUp(
-        request: SignUpRequest,
-        code: String
+        request: SignUpRequest
     ): UserDto {
+
         if (usersRepository.findByEmail(request.email) != null) {
             throw InvalidCredentialException("중복된 이메일입니다.")
         }
+
         if (request.password != request.confirmPassword) {
             throw InvalidCredentialException("비밀번호 확인이 비밀번호와 일치하지 않습니다.")
         }
+
+        val isVerified = redisUtils.isVerifiedEmail(request.email)
+        if (!isVerified) {
+            throw InvalidCredentialException("이메일 인증이 필요합니다.")
+        }
+
         with(Users) {
             validateEmail(request.email)
             validatePassword(request.password)
@@ -48,6 +59,9 @@ class UsersServiceImpl3(
                 name = request.name
             )
         )
+
+        redisUtils.deleteEmailData(request.email)
+
         return UserDto.fromEntity(user)
     }
 

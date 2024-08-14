@@ -11,7 +11,7 @@ import com.teamsparta.tikitaka.domain.users.dto.UserDto
 import com.teamsparta.tikitaka.infra.security.UserPrincipal
 
 interface UsersService3 {
-    fun signUp(request: SignUpRequest, code: String): UserDto
+    fun signUp(request: SignUpRequest): UserDto
     fun logIn(request: LoginRequest): LoginResponse
     fun logOut(token: String)
     fun validateRefreshTokenAndCreateToken(refreshToken: String): LoginResponse
