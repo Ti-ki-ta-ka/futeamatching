@@ -79,4 +79,9 @@ class RedisUtils(
         val verifiedEmailsKey = getVerifiedEmailsKey(email)
         return (redisTemplate.opsForSet().remove(verifiedEmailsKey, email) ?: 0) > 0
     }
+
+    fun setVerifiedEmailWithExpiration(email: String) {
+        val verifiedEmailsKey = getVerifiedEmailsKey(email)
+        redisTemplate.opsForValue().set(verifiedEmailsKey, email, Duration.ofSeconds(300))
+    }
 }

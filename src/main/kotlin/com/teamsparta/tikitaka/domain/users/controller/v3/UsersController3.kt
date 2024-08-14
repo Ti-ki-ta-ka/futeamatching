@@ -51,6 +51,7 @@ class UsersController3(
         @RequestBody dto: CodeDto
     ): ResponseEntity<String> {
         return if (emailService.verificationEmail(email, dto.code)) {
+            redisUtils.setVerifiedEmailWithExpiration(email)
             redisUtils.deleteData(email)
             ResponseEntity.ok("인증 성공. 회원가입을 진행하세요.")
         } else {
