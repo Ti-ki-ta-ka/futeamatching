@@ -32,7 +32,7 @@ class TeamEvaluationStepConfig(
     fun teamEvaluationStep(
         performanceListener: StepPerformanceListener
     ): Step {
-        return StepBuilder("teamEvaluationStep", jobRepository).chunk<Evaluation, Team>(100, transactionManager)
+        return StepBuilder("teamEvaluationStep", jobRepository).chunk<Evaluation, Team>(200, transactionManager)
             .reader(evaluationItemReader(evaluationRepository)).processor(evaluationItemProcessor(teamRepository))
             .writer(teamItemWriter()).listener(performanceListener).build()
     }
@@ -48,7 +48,7 @@ class TeamEvaluationStepConfig(
                 query
             },
             idExtractor = { it.id as Long }).apply {
-            setPageSize(100)
+            setPageSize(200)
         }
     }
 

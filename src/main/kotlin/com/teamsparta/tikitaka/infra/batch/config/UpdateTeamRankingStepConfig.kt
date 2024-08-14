@@ -68,34 +68,10 @@ class UpdateTeamRankingStepConfig(
                     currentRank = index + 1
                 }
 
-                val regionRanking = regionRanks.computeIfAbsent(team.region) { RegionRanking() }
+                val regionRanking = regionRanks.getOrPut(team.region) { RegionRanking() }
                 regionRanking.processTeam(team)
 
                 return team
-            }
-
-            inner class RegionRanking {
-                private var regionRank = 1L
-                private var regionPreviousScore: Int? = null
-                private var regionPreviousRank = 1L
-                private var regionIndex = 0L
-
-                fun processTeam(team: Team) {
-                    regionIndex++
-
-                    if (team.tierScore == 0) {
-                        team.regionRank = null
-                    } else {
-                        if (regionPreviousScore == team.tierScore) {
-                            team.regionRank = regionPreviousRank
-                        } else {
-                            team.regionRank = regionRank
-                            regionPreviousRank = regionRank
-                        }
-                        regionPreviousScore = team.tierScore
-                        regionRank = regionIndex + 1
-                    }
-                }
             }
         }
     }
@@ -105,6 +81,30 @@ class UpdateTeamRankingStepConfig(
     fun teamRankingItemWriter(): ItemWriter<Team> {
         return ItemWriter { teams ->
             teamRepository.saveAll(teams)
+        }
+    }
+}
+
+class RegionRanking {
+    private var regionRank = 1L
+    private var regionPreviousScore: Int? = null
+    private var regionPreviousRank = 1L
+    private var regionIndex = 0L
+
+    fun processTeam(team: Team) {
+        regionIndex++
+
+        if (team.tierScore == 0) {
+            team.regionRank = null
+        } else {
+            if (regionPreviousScore == team.tierScore) {
+                team.regionRank = regionPreviousRank
+            } else {
+                team.regionRank = regionRank
+                regionPreviousRank = regionRank
+            }
+            regionPreviousScore = team.tierScore
+            regionRank = regionIndex + 1
         }
     }
 }
