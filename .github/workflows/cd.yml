@@ -39,7 +39,7 @@ jobs:
             git pull origin main
             ./gradlew build -x test
             pkill -f 'java -jar' || true
-            cd build/libs
+            cd /home/ubuntu/.ssh/futeamatching/build/libs
             rm nohup.out
             nohup java -jar tiki-taka-0.0.1-SNAPSHOT.jar &
 
