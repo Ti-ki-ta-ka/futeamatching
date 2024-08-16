@@ -39,11 +39,9 @@ jobs:
             git pull origin main
             ./gradlew build -x test
             pkill -f 'java -jar' || true
-            pkill -f 'java' 
             cd /home/ubuntu/.ssh/futeamatching/build/libs
-            rm nohup.out
             chmod +x tiki-taka-0.0.1-SNAPSHOT.jar
-            nohup java -jar tiki-taka-0.0.1-SNAPSHOT.jar &
+            nohup java -jar tiki-taka-0.0.1-SNAPSHOT.jar >> nohup.out 2>&1 & disown
 
       - name: Remove Github Actions IP From Security Group
         run: |
