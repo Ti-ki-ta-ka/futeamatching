@@ -1,6 +1,5 @@
-package com.teamsparta.tikitaka.domain.team.repository.teamMember
+package com.teamsparta.tikitaka.domain.team.repository.teammember
 
-import com.teamsparta.tikitaka.domain.team.model.Team
 import com.teamsparta.tikitaka.domain.team.model.teammember.TeamMember
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
