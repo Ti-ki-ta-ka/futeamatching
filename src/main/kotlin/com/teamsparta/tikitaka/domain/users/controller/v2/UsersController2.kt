@@ -5,7 +5,6 @@ import com.teamsparta.tikitaka.domain.recruitment.service.v2.recruitmentapplicat
 import com.teamsparta.tikitaka.domain.team.dto.response.TeamResponse
 import com.teamsparta.tikitaka.domain.team.service.v2.TeamService2
 import com.teamsparta.tikitaka.domain.users.dto.*
-import com.teamsparta.tikitaka.domain.users.service.v1.UsersService
 import com.teamsparta.tikitaka.domain.users.dto.LoginRequest
 import com.teamsparta.tikitaka.domain.users.dto.LoginResponse
 import com.teamsparta.tikitaka.domain.users.dto.NameRequest

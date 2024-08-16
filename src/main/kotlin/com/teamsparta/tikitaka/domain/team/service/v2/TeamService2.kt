@@ -3,8 +3,6 @@ package com.teamsparta.tikitaka.domain.team.service.v2
 import com.teamsparta.tikitaka.domain.team.dto.request.TeamRequest
 import com.teamsparta.tikitaka.domain.team.dto.response.PageResponse
 import com.teamsparta.tikitaka.domain.team.dto.response.TeamResponse
-import com.teamsparta.tikitaka.domain.users.dto.NameResponse
-import com.teamsparta.tikitaka.domain.users.dto.UserDto
 import com.teamsparta.tikitaka.domain.users.dto.UserResponse
 import com.teamsparta.tikitaka.infra.security.UserPrincipal
 
