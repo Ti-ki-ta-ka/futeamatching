@@ -15,7 +15,7 @@ data class TeamResponse(
     val rank: Long?,
     val recruitStatus: Boolean,
     val region: String,
-    val createAt: LocalDateTime
+    val createAt: LocalDateTime?
 ) : Serializable {
     companion object {
 

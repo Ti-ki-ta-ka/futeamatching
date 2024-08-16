@@ -1,6 +1,6 @@
 package com.teamsparta.tikitaka.infra.oauth.oauthlogin.service
 
-import com.teamsparta.tikitaka.domain.team.repository.teamMember.TeamMemberRepository
+import com.teamsparta.tikitaka.domain.team.repository.teammember.TeamMemberRepository
 import com.teamsparta.tikitaka.infra.oauth.kakako.KakaoOAuthLoginClient
 import com.teamsparta.tikitaka.infra.oauth.naver.NaverOAuthLoginClient
 import com.teamsparta.tikitaka.infra.security.jwt.JwtPlugin

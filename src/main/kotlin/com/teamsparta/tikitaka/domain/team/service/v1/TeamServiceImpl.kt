@@ -8,7 +8,7 @@ import com.teamsparta.tikitaka.domain.team.dto.response.TeamResponse
 import com.teamsparta.tikitaka.domain.team.model.teammember.TeamMember
 import com.teamsparta.tikitaka.domain.team.model.teammember.TeamRole
 import com.teamsparta.tikitaka.domain.team.repository.TeamRepository
-import com.teamsparta.tikitaka.domain.team.repository.teamMember.TeamMemberRepository
+import com.teamsparta.tikitaka.domain.team.repository.teammember.TeamMemberRepository
 import com.teamsparta.tikitaka.domain.users.repository.UsersRepository
 import com.teamsparta.tikitaka.infra.security.UserPrincipal
 import org.springframework.data.domain.PageRequest
@@ -93,11 +93,20 @@ class TeamServiceImpl(
         teamId: Long
     ) {
         val team = teamRepository.findByIdOrNull(teamId) ?: throw ModelNotFoundException("team", teamId)
-        val teamMember = teamMemberRepository.findByIdOrNull(userId) ?: throw ModelNotFoundException("user", userId)
-        val user = usersRepository.findByIdOrNull(userId) ?: throw ModelNotFoundException("user", userId)
+        val teamMember = teamMemberRepository.findByUserId(userId)
         if (teamMember.team != team) throw IllegalStateException("팀 삭제 권한이 없습니다.")
-        user.teamStatus = false
+        val teamMembers = teamMemberRepository.findAllByTeamId(teamId)
+        teamMembers.forEach { member ->
+            val memberUser = usersRepository.findByIdOrNull(member.userId)
+                ?: throw ModelNotFoundException("user", member.userId)
+            memberUser.teamStatus = false
+            usersRepository.save(memberUser)
+
+            member.softDelete()
+            teamMemberRepository.save(member)
+        }
         team.softDelete()
+        teamRepository.save(team)
     }
 
     override fun getTeams(

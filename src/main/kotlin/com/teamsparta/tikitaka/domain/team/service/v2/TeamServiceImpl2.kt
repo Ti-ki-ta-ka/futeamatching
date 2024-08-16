@@ -8,8 +8,7 @@ import com.teamsparta.tikitaka.domain.team.dto.response.TeamResponse
 import com.teamsparta.tikitaka.domain.team.model.teammember.TeamMember
 import com.teamsparta.tikitaka.domain.team.model.teammember.TeamRole
 import com.teamsparta.tikitaka.domain.team.repository.TeamRepository
-import com.teamsparta.tikitaka.domain.team.repository.teamMember.TeamMemberRepository
-import com.teamsparta.tikitaka.domain.users.dto.UserDto
+import com.teamsparta.tikitaka.domain.team.repository.teammember.TeamMemberRepository
 import com.teamsparta.tikitaka.domain.users.dto.UserResponse
 import com.teamsparta.tikitaka.domain.users.repository.UsersRepository
 import com.teamsparta.tikitaka.infra.security.UserPrincipal
@@ -129,8 +128,8 @@ class TeamServiceImpl2(
         return TeamResponse.from(team)
     }
 
-    override fun getMyTeam(userPrincipal: UserPrincipal): TeamResponse {
-        val teamMember = teamMemberRepository.findByUserId(userPrincipal.id)
+    override fun getMyTeam(userPrincipal: UserPrincipal): TeamResponse? {
+        val teamMember = teamMemberRepository.findByUserIdOrNull(userPrincipal.id) ?: throw return null
         return TeamResponse.from(teamMember.team)
     }
 
@@ -146,13 +145,15 @@ class TeamServiceImpl2(
 
         return teamMembers!!.mapNotNull { member ->
             val user = usersRepository.findById(member.userId).orElse(null)
-            user?.let { UserResponse(
-                userId = it.id!!,
-                email = it.email,
-                name = it.name,
-                role = member.teamRole,
-                createdAt = it.createdAt
-            ) }
+            user?.let {
+                UserResponse(
+                    userId = it.id!!,
+                    email = it.email,
+                    name = it.name,
+                    role = member.teamRole,
+                    createdAt = it.createdAt
+                )
+            }
         }
     }
 }

@@ -11,5 +11,4 @@ import org.springframework.stereotype.Repository
 interface TeamRepository : JpaRepository<Team, Long>, CustomTeamRepository {
     fun findByRegionAndRankIsNotNull(region: Region, pageable: Pageable): Page<Team>
     fun findAllByRankIsNotNull(pageable: Pageable): Page<Team>
-    fun findAllByOrderByTierScoreDesc(): List<Team>
 }

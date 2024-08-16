@@ -14,7 +14,7 @@ data class MatchResponse(
     val matchDate: LocalDateTime,
     val region: Region,
     val location: String,
-    val content: String,
+    val content: String?,
     val matchStatus: Boolean,
     val createdAt: LocalDateTime,
 

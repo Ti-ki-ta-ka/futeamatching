@@ -3,7 +3,7 @@ package com.teamsparta.tikitaka.domain.users.service.v2
 import com.teamsparta.tikitaka.domain.common.exception.InvalidCredentialException
 import com.teamsparta.tikitaka.domain.common.exception.ModelNotFoundException
 import com.teamsparta.tikitaka.domain.common.util.RedisUtils
-import com.teamsparta.tikitaka.domain.team.repository.teamMember.TeamMemberRepository
+import com.teamsparta.tikitaka.domain.team.repository.teammember.TeamMemberRepository
 import com.teamsparta.tikitaka.domain.users.dto.*
 import com.teamsparta.tikitaka.domain.users.model.Users
 import com.teamsparta.tikitaka.domain.users.repository.UsersRepository
@@ -111,6 +111,17 @@ class UsersServiceImpl2(
         user.updatePassword(passwordEncoder.encode(request.password))
         usersRepository.save(user)
         return PasswordResponse.from(user)
+    }
+
+    override fun getOAuthProvider(userPrincipal: UserPrincipal): OAuthProviderResponse? {
+        val user = usersRepository.findByIdOrNull(userPrincipal.id) ?: throw return null
+        return OAuthProviderResponse.from(user)
+    }
+
+    override fun getMyProfile(userPrincipal: UserPrincipal): NameResponse {
+        val user =
+            usersRepository.findByIdOrNull(userPrincipal.id) ?: throw ModelNotFoundException("Users", userPrincipal.id)
+        return NameResponse.from(user)
     }
 
     fun isTokenBlacklisted(token: String): Boolean {
