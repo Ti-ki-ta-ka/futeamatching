@@ -5,7 +5,7 @@ import com.teamsparta.tikitaka.domain.common.exception.ModelNotFoundException
 import com.teamsparta.tikitaka.domain.team.dto.response.RemoveMemberResopnse
 import com.teamsparta.tikitaka.domain.team.dto.response.TeamMemberResponse
 import com.teamsparta.tikitaka.domain.team.model.teammember.TeamRole
-import com.teamsparta.tikitaka.domain.team.repository.teamMember.TeamMemberRepository
+import com.teamsparta.tikitaka.domain.team.repository.teammember.TeamMemberRepository
 import com.teamsparta.tikitaka.domain.users.repository.UsersRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service

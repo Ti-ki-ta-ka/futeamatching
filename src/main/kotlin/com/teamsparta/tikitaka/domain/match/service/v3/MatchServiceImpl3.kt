@@ -12,7 +12,7 @@ import com.teamsparta.tikitaka.domain.match.model.SortCriteria
 import com.teamsparta.tikitaka.domain.match.repository.MatchRepository
 import com.teamsparta.tikitaka.domain.match.repository.matchapplication.MatchApplicationRepository
 import com.teamsparta.tikitaka.domain.team.repository.TeamRepository
-import com.teamsparta.tikitaka.domain.team.repository.teamMember.TeamMemberRepository
+import com.teamsparta.tikitaka.domain.team.repository.teammember.TeamMemberRepository
 import com.teamsparta.tikitaka.domain.users.repository.UsersRepository
 import com.teamsparta.tikitaka.infra.aop.StopWatch
 import com.teamsparta.tikitaka.infra.security.UserPrincipal
