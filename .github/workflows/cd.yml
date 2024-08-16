@@ -34,14 +34,8 @@ jobs:
           port: ${{ secrets.AWS_SSH_PORT }}
           script_stop: true
           script: |
-            cd /home/ubuntu/.ssh/futeamatching
-            git checkout main
-            git pull origin main
-            ./gradlew build -x test
-            pkill -f 'java -jar' || true
-            cd /home/ubuntu/.ssh/futeamatching/build/libs
-            chmod +x tiki-taka-0.0.1-SNAPSHOT.jar
-            nohup java -jar tiki-taka-0.0.1-SNAPSHOT.jar > /dev/null 2>&1 &
+            chmod +x /home/ubuntu/.ssh/futeamatching/deploy.sh
+            sudo /home/ubuntu/.ssh/futeamatching/deploy.sh
 
       - name: Remove Github Actions IP From Security Group
         run: |
