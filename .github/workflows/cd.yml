@@ -33,6 +33,7 @@ jobs:
           key: ${{ secrets.AWS_SSH_KEY }}
           port: ${{ secrets.AWS_SSH_PORT }}
           script_stop: true
+          command_timeout: 240s
           script: |
             chmod +x /home/ubuntu/.ssh/futeamatching/deploy.sh
             sudo /home/ubuntu/.ssh/futeamatching/deploy.sh
