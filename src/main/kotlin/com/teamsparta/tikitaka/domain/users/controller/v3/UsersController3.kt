@@ -1,5 +1,6 @@
 package com.teamsparta.tikitaka.domain.users.controller.v3
 
+import com.teamsparta.tikitaka.domain.common.util.RedisUtils
 import com.teamsparta.tikitaka.domain.recruitment.dto.recruitmentapplication.RecruitmentApplicationResponse
 import com.teamsparta.tikitaka.domain.recruitment.service.v2.recruitmentapplication.RecruitmentApplicationService
 import com.teamsparta.tikitaka.domain.users.dto.CodeDto
@@ -33,7 +34,8 @@ import org.springframework.web.bind.annotation.RestController
 class UsersController3(
     private val userService: UsersService3,
     private val recruitmentApplicationService: RecruitmentApplicationService,
-    private val emailService: EmailService
+    private val emailService: EmailService,
+    private val redisUtils: RedisUtils
 ) {
     @GetMapping("/create-code")
     fun createCode(
@@ -49,18 +51,19 @@ class UsersController3(
         @RequestBody dto: CodeDto
     ): ResponseEntity<String> {
         return if (emailService.verificationEmail(email, dto.code)) {
-            ResponseEntity.ok(emailService.makeMemberId(email))
+            redisUtils.setVerifiedEmailWithExpiration(email)
+            redisUtils.deleteData(email)
+            ResponseEntity.ok("인증 성공. 회원가입을 진행하세요.")
         } else {
-            ResponseEntity.notFound().build()
+            ResponseEntity.status(HttpStatus.NOT_FOUND).body("인증 코드가 유효하지 않습니다.")
         }
     }
 
     @PostMapping("/sign-up")
     fun signUp(
-        @RequestBody request: SignUpRequest,
-        @RequestParam code: String
+        @RequestBody request: SignUpRequest
     ): ResponseEntity<UserDto> {
-        return ResponseEntity.ok(userService.signUp(request, code))
+        return ResponseEntity.ok(userService.signUp(request))
     }
 
     @PostMapping("/log-in")

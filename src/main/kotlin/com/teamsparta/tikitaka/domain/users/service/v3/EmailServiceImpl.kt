@@ -5,8 +5,6 @@ import jakarta.mail.internet.MimeMessage
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.stereotype.Service
-import java.security.MessageDigest
-import java.time.LocalDateTime
 import kotlin.random.Random
 
 @Service
@@ -55,13 +53,14 @@ class EmailServiceImpl(
 
     override fun verificationEmail(email: String, number: String): Boolean {
         val codeFoundByEmail = redisUtils.getData(email)
-        return codeFoundByEmail?.equals(number) ?: false
+        if (codeFoundByEmail != null && codeFoundByEmail == number) {
+            redisUtils.setVerifiedEmail(email)
+            return true
+        }
+        return false
     }
 
-    override fun makeMemberId(email: String): String {
-        val md = MessageDigest.getInstance("SHA-256")
-        md.update(email.toByteArray())
-        md.update(LocalDateTime.now().toString().toByteArray())
-        return md.digest().joinToString("") { String.format("%02x", it) }
+    override fun isVerified(email: String): Boolean {
+        return redisUtils.isVerifiedEmail(email)
     }
 }

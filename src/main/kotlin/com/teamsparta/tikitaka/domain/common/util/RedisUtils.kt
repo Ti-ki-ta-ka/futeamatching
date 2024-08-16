@@ -14,6 +14,7 @@ class RedisUtils(
         private val DURATION_TIME = 1000 * 60 * 60 * 24L
         private val REFRESH_TOKEN_DURATION_TIME = 1000 * 60 * 60 * 24L * 7
         private const val KEY_PREFIX = "refreshToken"
+        private const val VERIFIED_EMAILS_KEY = "verified_emails"
     }
 
     fun getData(key: String): String? {
@@ -58,5 +59,30 @@ class RedisUtils(
         val valueOperations: ValueOperations<String, String> = redisTemplate.opsForValue()
         val expireDuration = Duration.ofSeconds(duration)
         valueOperations.set(key, value, expireDuration)
+    }
+
+    private fun getVerifiedEmailsKey(email: String): String {
+        return "$VERIFIED_EMAILS_KEY:$email"
+    }
+
+    fun setVerifiedEmail(email: String) {
+        val verifiedEmailsKey = getVerifiedEmailsKey(email)
+        redisTemplate.opsForSet().add(verifiedEmailsKey, email)
+    }
+
+    fun isVerifiedEmail(email: String): Boolean {
+        val verifiedEmailsKey = getVerifiedEmailsKey(email)
+        return redisTemplate.opsForSet().isMember(verifiedEmailsKey, email) ?: false
+    }
+
+    fun deleteEmailData(email: String): Boolean {
+        val verifiedEmailsKey = getVerifiedEmailsKey(email)
+        return (redisTemplate.opsForSet().remove(verifiedEmailsKey, email) ?: 0) > 0
+    }
+
+    fun setVerifiedEmailWithExpiration(email: String) {
+        val verifiedEmailsKey = getVerifiedEmailsKey(email)
+        redisTemplate.opsForSet().add(verifiedEmailsKey, email)
+        redisTemplate.expire(verifiedEmailsKey, Duration.ofSeconds(300))
     }
 }
