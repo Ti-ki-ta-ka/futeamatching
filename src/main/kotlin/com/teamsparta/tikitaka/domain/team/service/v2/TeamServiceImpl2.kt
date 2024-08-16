@@ -129,8 +129,8 @@ class TeamServiceImpl2(
         return TeamResponse.from(team)
     }
 
-    override fun getMyTeam(userPrincipal: UserPrincipal): TeamResponse {
-        val teamMember = teamMemberRepository.findByUserId(userPrincipal.id)
+    override fun getMyTeam(userPrincipal: UserPrincipal): TeamResponse? {
+        val teamMember = teamMemberRepository.findByUserIdOrNull(userPrincipal.id) ?: throw return null
         return TeamResponse.from(teamMember.team)
     }
 
