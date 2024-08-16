@@ -98,12 +98,28 @@ class UsersController2(
             .body(teamService2.getMyTeam(userPrincipal))
     }
 
+    @GetMapping("/oauth-provider")
+    fun getOauthProvider(
+        @AuthenticationPrincipal userPrincipal: UserPrincipal
+    ):ResponseEntity<OAuthProviderResponse>{
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(userService.getOAuthProvider(userPrincipal))
+    }
+
     @GetMapping("/my-team-member")
     fun getMyTeamMembers(
         @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): ResponseEntity<List<UserResponse>> {
         return ResponseEntity.status(HttpStatus.OK)
             .body(teamService2.getMyTeamMembers(userPrincipal))
+    }
+
+    @GetMapping("/my-profile")
+    fun getMyProfile(
+        @AuthenticationPrincipal userPrincipal: UserPrincipal
+    ):ResponseEntity<NameResponse>{
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(userService.getMyProfile(userPrincipal))
     }
 
 
