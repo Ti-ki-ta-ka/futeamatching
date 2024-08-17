@@ -1,5 +1,5 @@
 # 빌드된 JAR 파일 찾기
-BUILD_JAR=$(ls /home/ubuntu/.ssh/futeamatching/build/libs/*.jar)
+BUILD_JAR=$(ls /home/ubuntu/.ssh/futeamatching/build/libs/tiki-taka-0.0.1-SNAPSHOT.jar)
 JAR_NAME=$(basename $BUILD_JAR)
 echo ">>> 빌드 파일명: $JAR_NAME" >> /home/ubuntu/deploy.log
 
