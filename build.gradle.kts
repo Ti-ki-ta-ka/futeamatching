@@ -102,5 +102,10 @@ tasks.withType<Test> {
 }
 
 tasks.getByName<Jar>("jar") {
-    enabled = false
+    enabled = true
+    manifest {
+        attributes(
+            "Main-Class" to "com.teamsparta.tikitaka.TikiTakaApplication"
+        )
+    }
 }
