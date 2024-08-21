@@ -50,7 +50,7 @@ class TeamRepositoryImpl : CustomTeamRepository, QueryDslSupport() {
         return PageImpl(contents, pageable, totalCount)
     }
 
-    override fun findByName(pageable: Pageable, name: String, region: String?): Page<Team> {
+    override fun findTeamsByName(pageable: Pageable, name: String, region: String?): Page<Team> {
         val whereClause = BooleanBuilder()
         whereClause.and(team.name.containsIgnoreCase(name))
 

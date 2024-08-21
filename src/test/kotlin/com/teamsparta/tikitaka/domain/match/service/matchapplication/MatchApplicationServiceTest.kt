@@ -1,6 +1,7 @@
 package com.teamsparta.tikitaka.domain.match.service.matchapplication
 
 import com.teamsparta.tikitaka.domain.common.Region
+import com.teamsparta.tikitaka.domain.evaluation.repository.SuccessMatchRepository
 import com.teamsparta.tikitaka.domain.match.dto.matchapplication.ReplyApplicationRequest
 import com.teamsparta.tikitaka.domain.match.model.Match
 import com.teamsparta.tikitaka.domain.match.model.matchapplication.ApproveStatus
@@ -10,11 +11,12 @@ import com.teamsparta.tikitaka.domain.match.repository.matchapplication.MatchApp
 import com.teamsparta.tikitaka.domain.match.service.v2.matchapplication2.MatchApplicationServiceImpl2
 import com.teamsparta.tikitaka.domain.team.model.teammember.TeamMember
 import com.teamsparta.tikitaka.domain.team.model.teammember.TeamRole
-import com.teamsparta.tikitaka.domain.team.repository.teamMember.TeamMemberRepository
+import com.teamsparta.tikitaka.domain.team.repository.teammember.TeamMemberRepository
 import com.teamsparta.tikitaka.domain.users.model.Users
 import com.teamsparta.tikitaka.domain.users.repository.UsersRepository
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
+import io.mockk.MockKSettings.recordPrivateCalls
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
@@ -28,13 +30,15 @@ class MatchApplicationServiceTest : BehaviorSpec({
     val matchRepository = mockk<MatchRepository>()
     val usersRepository = mockk<UsersRepository>()
     val teamMemberRepository = mockk<TeamMemberRepository>()
+    val successMatchRepository = mockk<SuccessMatchRepository>()
 
     val matchApplicationService = spyk(
         MatchApplicationServiceImpl2(
             matchApplicationRepository,
             matchRepository,
             usersRepository,
-            teamMemberRepository
+            teamMemberRepository,
+            successMatchRepository
         ),
         recordPrivateCalls = true
     )

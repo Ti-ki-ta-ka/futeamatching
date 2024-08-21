@@ -1,5 +1,6 @@
 package com.teamsparta.tikitaka.domain.team.service.v2
 
+import com.teamsparta.tikitaka.domain.common.exception.InvalidCredentialException
 import com.teamsparta.tikitaka.domain.common.exception.ModelNotFoundException
 import com.teamsparta.tikitaka.domain.team.dto.request.TeamRequest
 import com.teamsparta.tikitaka.domain.team.dto.request.toEntity
@@ -37,7 +38,7 @@ class TeamServiceImpl2(
     ): PageResponse<TeamResponse> {
         val sortDirection = getDirection(direction)
         val pageable: Pageable = PageRequest.of(page, size, sortDirection, sortBy)
-        val pageContent = teamRepository.findByName(pageable, name, region)
+        val pageContent = teamRepository.findTeamsByName(pageable, name, region)
 
 
 
@@ -57,6 +58,10 @@ class TeamServiceImpl2(
         val user = usersRepository.findByIdOrNull(principal.id) ?: throw ModelNotFoundException("User", principal.id)
         if (user.teamStatus) throw IllegalStateException("유저는 하나의 팀에 소속될 수 있습니다.")
         user.teamStatus = true
+
+        if(teamRepository.findByName(request.name) != null){
+            throw InvalidCredentialException("중복된 팀이름입니다.")
+        }
 
 
         val team = request.toEntity(principal.id)
