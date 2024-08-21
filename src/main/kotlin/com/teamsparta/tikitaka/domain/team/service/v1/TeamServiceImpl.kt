@@ -36,7 +36,7 @@ class TeamServiceImpl(
     ): PageResponse<TeamResponse> {
         val sortDirection = getDirection(direction)
         val pageable: Pageable = PageRequest.of(page, size, sortDirection, sortBy)
-        val pageContent = teamRepository.findByName(pageable, name, region)
+        val pageContent = teamRepository.findTeamsByName(pageable, name, region)
 
 
 

@@ -14,6 +14,7 @@ import com.teamsparta.tikitaka.domain.match.model.matchapplication.ApproveStatus
 import com.teamsparta.tikitaka.domain.match.model.matchapplication.MatchApplication
 import com.teamsparta.tikitaka.domain.match.repository.MatchRepository
 import com.teamsparta.tikitaka.domain.match.repository.matchapplication.MatchApplicationRepository
+import com.teamsparta.tikitaka.domain.team.model.QTeam.team
 import com.teamsparta.tikitaka.domain.team.model.teammember.TeamRole
 import com.teamsparta.tikitaka.domain.team.repository.teammember.TeamMemberRepository
 import com.teamsparta.tikitaka.domain.users.repository.UsersRepository
@@ -44,6 +45,10 @@ class MatchApplicationServiceImpl2(
         val teamId = teamMember.team.id
         validateMatchAvailability(matchPost, teamId!!)
         validateExistingApplications(teamId, matchId, matchPost.matchDate.toLocalDate())
+
+        if(teamMember.team.id == matchPost.teamId){
+            throw IllegalStateException("자신의 팀에는 매치신청을 할 수 없습니다.")
+        }
 
         val newApplication = MatchApplication.of(matchPost, teamId, userId)
         return MatchApplicationResponse.from(matchApplicationRepository.save(newApplication))

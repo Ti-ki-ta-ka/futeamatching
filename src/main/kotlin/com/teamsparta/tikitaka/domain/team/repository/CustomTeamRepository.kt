@@ -6,6 +6,6 @@ import org.springframework.data.domain.Pageable
 
 interface CustomTeamRepository {
     fun findAllByPageable(pageable: Pageable, region: String?): Page<Team>
-    fun findByName(pageable: Pageable, name: String, region: String?): Page<Team>
+    fun findTeamsByName(pageable: Pageable, name: String, region: String?): Page<Team>
 
 }
