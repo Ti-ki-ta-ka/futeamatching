@@ -56,9 +56,10 @@ FuTeamMatching은 풋살 팀관리와 경기 일정 관리를 용이하게 하�
 - JDK 17 이상
 - Gradle
 
-## 📦 의존성
 
-이 프로젝트는 다음과 같은 의존성을 사용합니다:
+### **종속성 관리**
+
+프로젝트에서 사용된 주요 라이브러리 및 프레임워크는 다음과 같습니다:
 
 - `spring-boot-starter-web`: 웹 애플리케이션을 구축하기 위한 스타터.
 - `jackson-module-kotlin`: Kotlin 지원을 위한 Jackson 모듈.
@@ -69,6 +70,9 @@ FuTeamMatching은 풋살 팀관리와 경기 일정 관리를 용이하게 하�
 - `springdoc-openapi-starter-webmvc-ui`: Spring WebMVC와 Springdoc OpenAPI 통합을 위한 스타터.
 - `spring-boot-starter-security`: Spring Security를 위한 스타터.
 - `jjwt`: JWT를 사용하기 위한 라이브러리.
+- `querydsl-jpa`: 복잡한 SQL 쿼리를 타입 안전하게 작성하기 위한 라이브러리.
+- `kotest`: 테스트 라이브러리.
+- `mockk`: 테스트 라이브러리.
 
 
 
