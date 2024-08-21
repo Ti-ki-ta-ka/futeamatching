@@ -2,12 +2,15 @@ package com.teamsparta.tikitaka.domain.recruitment.repository
 
 import com.teamsparta.tikitaka.domain.recruitment.dto.RecruitmentResponse
 import com.teamsparta.tikitaka.domain.recruitment.model.QRecruitment
+import com.teamsparta.tikitaka.domain.team.service.v3.TeamService3
 import com.teamsparta.tikitaka.infra.querydsl.QueryDslSupport
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 
-class RecruitmentRepositoryImpl : CustomRecruitmentRepository, QueryDslSupport() {
+class RecruitmentRepositoryImpl(
+    private val teamService: TeamService3
+) : CustomRecruitmentRepository, QueryDslSupport() {
     private val recruitment = QRecruitment.recruitment
 
     override fun findRecruitmentsClosingStatusFalse(
@@ -28,7 +31,8 @@ class RecruitmentRepositoryImpl : CustomRecruitmentRepository, QueryDslSupport()
                 .fetch()
 
         val recruitmentResponse = recruitments.map { rec ->
-            RecruitmentResponse.from(rec)
+            val teamResponse = teamService.getTeam(rec.teamId)
+            RecruitmentResponse.from(rec, teamResponse)
         }
 
         return PageImpl(recruitmentResponse, pageable, totalCount)

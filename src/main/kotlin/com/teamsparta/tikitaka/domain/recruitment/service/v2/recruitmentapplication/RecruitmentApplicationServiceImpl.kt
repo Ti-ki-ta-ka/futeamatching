@@ -33,7 +33,7 @@ class RecruitmentApplicationServiceImpl(
         if (recruitment.closingStatus) throw IllegalStateException("This recruitment has already been closed.")
 
         val newApplication = RecruitmentApplication.of(recruitment, userId, "WAITING")
-        return RecruitmentApplicationResponse.from(recruitmentApplicationRepository.save(newApplication))
+        return RecruitmentApplicationResponse.from(recruitmentApplicationRepository.save(newApplication), applicant)
     }
 
     @Transactional
@@ -47,7 +47,10 @@ class RecruitmentApplicationServiceImpl(
         validateCancelable(application)
         application.responseStatus = ResponseStatus.CANCELLED
 
-        return RecruitmentApplicationResponse.from(application)
+        val user = userRepository.findByIdOrNull(application.userId)
+            ?: throw ModelNotFoundException("user", application.userId)
+
+        return RecruitmentApplicationResponse.from(application, user)
     }
 
     override fun getMyApplications(
@@ -56,7 +59,11 @@ class RecruitmentApplicationServiceImpl(
         val applications = recruitmentApplicationRepository.findByUserId(principal.id)
             ?: throw ModelNotFoundException("applications by userId", principal.id)
 
-        return applications.map { RecruitmentApplicationResponse.from(it) }
+        return applications.map { application ->
+            val user = userRepository.findByIdOrNull(application.userId)
+                ?: throw ModelNotFoundException("user", application.userId)
+            RecruitmentApplicationResponse.from(application, user)
+        }
     }
 
     private fun findApplicationById(applicationId: Long) =

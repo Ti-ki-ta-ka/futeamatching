@@ -60,6 +60,10 @@ class SecurityConfig(
                     "/api/v3/users/create-code/**",
                     "/api/v2/oauth/**",
                     "/api/v2/login/oauth2/**",
+                    "/api/v2/api/v2/recruitments/**",
+                    "/api/v2/api/v2/leader/recruitments/**"
+
+
 
                 ).permitAll()
                     .anyRequest().authenticated()
