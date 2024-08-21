@@ -9,6 +9,7 @@ import com.teamsparta.tikitaka.domain.recruitment.repository.RecruitmentReposito
 import com.teamsparta.tikitaka.domain.recruitment.repository.recruitmentapplication.RecruitmentApplicationRepository
 import com.teamsparta.tikitaka.domain.team.repository.TeamRepository
 import com.teamsparta.tikitaka.domain.team.service.v2.LeaderTeamService2
+import com.teamsparta.tikitaka.domain.users.repository.UsersRepository
 import jakarta.transaction.Transactional
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -19,6 +20,7 @@ class LeaderRecruitmentApplicationServiceImpl(
     private val recruitmentApplicationRepository: RecruitmentApplicationRepository,
     private val teamRepository: TeamRepository,
     private val teamService: LeaderTeamService2,
+    private val userRepository: UsersRepository
 ) : LeaderRecruitmentApplicationService {
 
     @Transactional
@@ -29,6 +31,7 @@ class LeaderRecruitmentApplicationServiceImpl(
             "recruitment",
             recruitmentId
         )
+        val user = userRepository.findByIdOrNull(userId) ?: throw ModelNotFoundException("user", userId)
         if (recruitmentPost.userId != userId) {
             throw AccessDeniedException("You can only respond to applications for your own team's Recruitment.")
         }
@@ -66,7 +69,7 @@ class LeaderRecruitmentApplicationServiceImpl(
         if (application.responseStatus == ResponseStatus.APPROVE) {
             rejectOtherApplications(recruitmentId, applicationId)
         }
-        return RecruitmentApplicationResponse.from(application)
+        return RecruitmentApplicationResponse.from(application, user)
     }
 
     private fun rejectOtherApplications(recruitmentId: Long, approvedApplicationId: Long) {

@@ -1,10 +1,12 @@
 package com.teamsparta.tikitaka.domain.recruitment.repository.recruitmentapplication
 
 import com.querydsl.core.BooleanBuilder
+import com.teamsparta.tikitaka.domain.common.exception.ModelNotFoundException
 import com.teamsparta.tikitaka.domain.recruitment.dto.recruitmentapplication.RecruitmentApplicationResponse
 import com.teamsparta.tikitaka.domain.recruitment.model.QRecruitment
 import com.teamsparta.tikitaka.domain.recruitment.model.recruitmentapplication.QRecruitmentApplication
 import com.teamsparta.tikitaka.domain.recruitment.model.recruitmentapplication.ResponseStatus
+import com.teamsparta.tikitaka.domain.users.repository.UsersRepository
 import com.teamsparta.tikitaka.infra.querydsl.QueryDslSupport
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
@@ -12,7 +14,9 @@ import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Repository
 
 @Repository
-class RecruitmentApplicationRepositoryImpl : CustomRecruitmentApplicationRepository, QueryDslSupport() {
+class RecruitmentApplicationRepositoryImpl(
+    private val usersRepository: UsersRepository
+) : CustomRecruitmentApplicationRepository, QueryDslSupport() {
     private val recruitmentApplication = QRecruitmentApplication.recruitmentApplication
     private val recruitment = QRecruitment.recruitment
 
@@ -35,11 +39,15 @@ class RecruitmentApplicationRepositoryImpl : CustomRecruitmentApplicationReposit
                 .limit(pageable.pageSize.toLong()).fetch()
 
         val recruitmentApplicationResponse = applications.map { application ->
+            val user = usersRepository.findById(application.userId)
+                .orElseThrow { ModelNotFoundException("User", application.userId) }
+
             RecruitmentApplicationResponse(
                 applicationId = application.id!!,
                 userId = application.userId,
                 responseStatus = application.responseStatus.toString(),
-                createdAt = application.createdAt
+                createdAt = application.createdAt,
+                user = user
             )
         }
         return PageImpl(recruitmentApplicationResponse, pageable, totalCount)

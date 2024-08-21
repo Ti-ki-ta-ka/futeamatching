@@ -13,6 +13,7 @@ import com.teamsparta.tikitaka.domain.team.model.teammember.TeamRole
 import com.teamsparta.tikitaka.domain.team.repository.TeamRepository
 import com.teamsparta.tikitaka.domain.team.repository.teammember.TeamMemberRepository
 import com.teamsparta.tikitaka.domain.team.service.v3.TeamService3
+import com.teamsparta.tikitaka.domain.users.repository.UsersRepository
 import com.teamsparta.tikitaka.infra.security.UserPrincipal
 import jakarta.transaction.Transactional
 import org.springframework.data.domain.Page
@@ -26,7 +27,8 @@ class LeaderRecruitmentServiceImpl(
     private val teamMemberRepository: TeamMemberRepository,
     private val recruitmentRepository: RecruitmentRepository,
     private val recruitmentApplicationRepository: RecruitmentApplicationRepository,
-    private val teamService: TeamService3
+    private val teamService: TeamService3,
+    private val usersRepository: UsersRepository,
 ) : LeaderRecruitmentService {
     override fun postRecruitment(principal: UserPrincipal, request: PostRecruitmentRequest): RecruitmentResponse {
 
@@ -126,7 +128,11 @@ class LeaderRecruitmentServiceImpl(
         }
         val applications =
             recruitmentApplicationRepository.findApplicationsByRecruitmentId(pageable, recruitmentId, responseStatus)
-        return applications
+        return applications.map { application ->
+            val user = usersRepository.findById(application.userId)
+                .orElseThrow { ModelNotFoundException("User", application.userId) }
+            application.copy(user = user)
+        }
     }
 
     override fun getMyTeamRecruitments(
