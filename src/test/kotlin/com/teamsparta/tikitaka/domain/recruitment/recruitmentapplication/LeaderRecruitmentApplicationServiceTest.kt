@@ -14,7 +14,7 @@ import com.teamsparta.tikitaka.domain.recruitment.service.v2.recruitmentapplicat
 import com.teamsparta.tikitaka.domain.team.model.Team
 import com.teamsparta.tikitaka.domain.team.model.teammember.TeamMember
 import com.teamsparta.tikitaka.domain.team.repository.TeamRepository
-import com.teamsparta.tikitaka.domain.team.service.v2.LeaderTeamService
+import com.teamsparta.tikitaka.domain.team.service.v2.LeaderTeamService2
 import com.teamsparta.tikitaka.domain.users.model.Users
 import com.teamsparta.tikitaka.domain.users.repository.UsersRepository
 import io.kotest.assertions.throwables.shouldThrow
@@ -34,12 +34,13 @@ class LeaderRecruitmentApplicationServiceTest {
     private val recruitmentApplicationRepository = mockk<RecruitmentApplicationRepository>()
     private val teamRepository = mockk<TeamRepository>()
     private val userRepository = mockk<UsersRepository>()
-    private val teamService = mockk<LeaderTeamService>()
+    private val teamService = mockk<LeaderTeamService2>()
     private val service = LeaderRecruitmentApplicationServiceImpl(
         recruitmentRepository,
         recruitmentApplicationRepository,
         teamRepository,
-        teamService
+        teamService,
+        userRepository
     )
 
     @Test

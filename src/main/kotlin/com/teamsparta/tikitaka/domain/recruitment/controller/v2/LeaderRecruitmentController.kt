@@ -28,7 +28,7 @@ class LeaderRecruitmentController(
         @AuthenticationPrincipal principal: UserPrincipal, @RequestBody request: PostRecruitmentRequest
     ): ResponseEntity<RecruitmentResponse> {
         return preAuthorize.hasAnyRole(principal, setOf(TeamRole.LEADER)) {
-            ResponseEntity.status(HttpStatus.OK).body(leaderRecruitmentService.postRecruitment(principal, request))
+            ResponseEntity.status(HttpStatus.CREATED).body(leaderRecruitmentService.postRecruitment(principal, request))
         }
     }
 
